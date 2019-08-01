@@ -18,8 +18,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#ifndef QRSS_READER_ITEM_HPP
-#define QRSS_READER_ITEM_HPP
+#ifndef QRSS_READER_LINK_HPP
+#define QRSS_READER_LINK_HPP
 
 // -----------------------------------------------------------
 
@@ -37,100 +37,63 @@
 #include <QString>
 #endif // !QSTRING_H
 
-// Include QMap
-#ifndef QMAP_H
-#include <QMap>
-#endif // !QMAP_H
+// Include QUrl
+#ifndef QURL_H
+#include <QUrl>
+#endif // !QURL_H
 
 // ===========================================================
-// Item
+// LINK
 // ===========================================================
 
 namespace rss
 {
 
 	/**
-	  * Item - struct to store & manage RSS Channel's Item-Element data.
+	  * Link - Link Element of RSS Channel & Item.
 	  *
 	  * @brief
-	  * Item contains sub-Elements, like <description>, <enclosure>, <guid>, etc.
+	  * Link - Url.
 	  *
 	  * @version 1.0
 	  * @since 21.07.2019
 	  * @authors Denis Z. (code4un@yandex.ru)
 	**/
-	struct Item final : public Element
-	{
+	struct Link final : public Element
+    {
 
 		// -----------------------------------------------------------
 
 		// ===========================================================
-		// CONFIG
+		// CONSTANTS
 		// ===========================================================
 
-		/** Alias for Element pointer. **/
-		using element_ptr_t = Element*;
+		/** QUrl **/
+		const QUrl mUrl;
 
 		// ===========================================================
 		// CONSTRUCTOR
 		// ===========================================================
 
 		/**
-		  * Item constructor.
+		  * Link constructor.
 		  *
+		  * @param pUrl - QString with Url.
+		  * @param pType - Element-Type, default is Link.
 		  * @throws - no exceptions.
 		**/
-		explicit Item( ) noexcept;
+		explicit Link( const QString & pUrl, const Element::Type pType = Element::Type::LINK ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR
 		// ===========================================================
 
 		/**
-		  * Item destructor.
+		  * Link destructor.
 		  *
 		  * @throws - no exceptions.
 		**/
-		virtual ~Item( ) noexcept final;
-
-		// ===========================================================
-		// GETTERS & SETTERS
-		// ===========================================================
-
-		/**
-		  * Searches for a Element of Item.<br/>
-		  *
-		  * (?) To Convert QString || int to Element-Type, use Channel-class
-		  * or Element::Type directly.<br/>
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @param pType - Element-Type.
-		  * @return - Element, or null.
-		  * @throws - no exceptions.
-		**/
-		element_ptr_t getElement( const ElementType pType ) const noexcept;
-
-		/**
-		  * Sets Item's Element.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @param pElement - Element to add.
-		  * @return - 'true' if set, 'false' if not (Element with the same type already set), or Item can't store this type.
-		  * @throws - no exceptions.
-		**/
-		bool setElement( element_ptr_t pElement ) noexcept;
-
-		// ===========================================================
-		// METHODS
-		// ===========================================================
-
-		/**
-		  * Deletes all Item's Elements.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @throws - no exceptions.
-		**/
-		void releaseElements( ) noexcept;
+		virtual ~Link( ) noexcept final;
 
 		// -----------------------------------------------------------
 
@@ -139,34 +102,27 @@ namespace rss
 		// -----------------------------------------------------------
 
 		// ===========================================================
-		// FIELDS
-		// ===========================================================
-
-		/** Elements. **/
-		QMap<ElementType, element_ptr_t> elements;
-
-		// ===========================================================
 		// DELETED CONSTRUCTORS & OPERATORS
 		// ===========================================================
 
-		/** @deleted Item const copy constructor. **/
-		Item( const Item & ) noexcept = delete;
+		/** @deleted Link const copy constructor. **/
+		Link( const Link & ) noexcept = delete;
 
-		/** @deleted Item copy-assignment operator. **/
-		Item & operator=( const Item & ) noexcept = delete;
+		/** @deleted Link copy-assignment operator. **/
+		Link & operator=( const Link & ) noexcept = delete;
 
-		/** @deleted Item move constructor. **/
-		Item( Item && ) noexcept = delete;
+		/** @deleted Link move constructor. **/
+		Link( Link && ) noexcept = delete;
 
-		/** @deleted Item move assignment operator. **/
-		Item & operator=( Item && ) noexcept = delete;
+		/** @deleted Link move assignment operator. **/
+		Link & operator=( Link && ) noexcept = delete;
 
 		// -----------------------------------------------------------
 
-	}; // rss::Item
+    }; // rss::Link
 
 } // rss
 
 // -----------------------------------------------------------
 
-#endif // !QRSS_READER_ITEM_HPP
+#endif // !QRSS_READER_LINK_HPP

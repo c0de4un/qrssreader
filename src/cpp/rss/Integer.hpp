@@ -18,8 +18,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#ifndef QRSS_READER_ITEM_HPP
-#define QRSS_READER_ITEM_HPP
+#ifndef QRSS_READER_INTEGER_HPP
+#define QRSS_READER_INTEGER_HPP
 
 // -----------------------------------------------------------
 
@@ -37,100 +37,65 @@
 #include <QString>
 #endif // !QSTRING_H
 
-// Include QMap
-#ifndef QMAP_H
-#include <QMap>
-#endif // !QMAP_H
-
 // ===========================================================
-// Item
+// Integer
 // ===========================================================
 
 namespace rss
 {
 
+	// -----------------------------------------------------------
+
 	/**
-	  * Item - struct to store & manage RSS Channel's Item-Element data.
+	  * Integer - RSS Channel Element with integer value.
 	  *
 	  * @brief
-	  * Item contains sub-Elements, like <description>, <enclosure>, <guid>, etc.
-	  *
-	  * @version 1.0
-	  * @since 21.07.2019
-	  * @authors Denis Z. (code4un@yandex.ru)
+	  * Integer RSS Element used for ttl, skipHours, skipDays.
 	**/
-	struct Item final : public Element
+	struct Integer final : public Element
 	{
 
 		// -----------------------------------------------------------
 
 		// ===========================================================
-		// CONFIG
+		// CONSTANTS
 		// ===========================================================
 
-		/** Alias for Element pointer. **/
-		using element_ptr_t = Element*;
+		/** Int-value. **/
+		const int mValue;
 
 		// ===========================================================
-		// CONSTRUCTOR
+		// CONSTRUCTORS
 		// ===========================================================
 
 		/**
-		  * Item constructor.
+		  * Integer constructor.
 		  *
+		  * @param strValue - QString with int-value. Value not modified.
+		  * @param pType - Element-Type (ttl, skipHours, skipDays).
 		  * @throws - no exceptions.
 		**/
-		explicit Item( ) noexcept;
+		explicit Integer( const QString & strValue, const Element::Type pType = Element::Type::TTL ) noexcept;
+
+		/**
+		  * Integer constructor.
+		  *
+		  * @param pValue - int-value, value copied.
+		  * @param pType - Element-Type (ttl, skipHours, skipDays).
+		  * @throws - no exceptions.
+		**/
+		explicit Integer( const int pValue, const Element::Type pType = Element::Type::TTL ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR
 		// ===========================================================
 
 		/**
-		  * Item destructor.
+		  * Integer destructor.
 		  *
 		  * @throws - no exceptions.
 		**/
-		virtual ~Item( ) noexcept final;
-
-		// ===========================================================
-		// GETTERS & SETTERS
-		// ===========================================================
-
-		/**
-		  * Searches for a Element of Item.<br/>
-		  *
-		  * (?) To Convert QString || int to Element-Type, use Channel-class
-		  * or Element::Type directly.<br/>
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @param pType - Element-Type.
-		  * @return - Element, or null.
-		  * @throws - no exceptions.
-		**/
-		element_ptr_t getElement( const ElementType pType ) const noexcept;
-
-		/**
-		  * Sets Item's Element.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @param pElement - Element to add.
-		  * @return - 'true' if set, 'false' if not (Element with the same type already set), or Item can't store this type.
-		  * @throws - no exceptions.
-		**/
-		bool setElement( element_ptr_t pElement ) noexcept;
-
-		// ===========================================================
-		// METHODS
-		// ===========================================================
-
-		/**
-		  * Deletes all Item's Elements.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @throws - no exceptions.
-		**/
-		void releaseElements( ) noexcept;
+		virtual ~Integer( ) noexcept final;
 
 		// -----------------------------------------------------------
 
@@ -139,34 +104,44 @@ namespace rss
 		// -----------------------------------------------------------
 
 		// ===========================================================
-		// FIELDS
-		// ===========================================================
-
-		/** Elements. **/
-		QMap<ElementType, element_ptr_t> elements;
-
-		// ===========================================================
 		// DELETED CONSTRUCTORS & OPERATORS
 		// ===========================================================
 
-		/** @deleted Item const copy constructor. **/
-		Item( const Item & ) noexcept = delete;
+		/** @deleted Integer const copy constructor. **/
+		Integer( const Integer & ) noexcept = delete;
 
-		/** @deleted Item copy-assignment operator. **/
-		Item & operator=( const Item & ) noexcept = delete;
+		/** @deleted Integer copy-assignment operator. **/
+		Integer & operator=( const Integer & ) noexcept = delete;
 
-		/** @deleted Item move constructor. **/
-		Item( Item && ) noexcept = delete;
+		/** @deleted Integer move constructor. **/
+		Integer( Integer && ) noexcept = delete;
 
-		/** @deleted Item move assignment operator. **/
-		Item & operator=( Item && ) noexcept = delete;
+		/** @deleted Integer move assignment operator. **/
+		Integer & operator=( Integer && ) noexcept = delete;
 
 		// -----------------------------------------------------------
 
-	}; // rss::Item
+	}; // rss::Integer
+
+	// -----------------------------------------------------------
+
+	// ===========================================================
+	// Aliases
+	// ===========================================================
+
+	/** TTL **/
+	using TTL = Integer;
+
+	/** Skip Hours **/
+	using SkipHours = Integer;
+
+	/** Skip Days. **/
+	using SkipDays = Integer;
+
+	// -----------------------------------------------------------
 
 } // rss
 
 // -----------------------------------------------------------
 
-#endif // !QRSS_READER_ITEM_HPP
+#endif // !QRSS_READER_INTEGER_HPP

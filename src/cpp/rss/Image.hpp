@@ -18,8 +18,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#ifndef QRSS_READER_ITEM_HPP
-#define QRSS_READER_ITEM_HPP
+#ifndef QRSS_READER_IMAGE_HPP
+#define QRSS_READER_IMAGE_HPP
 
 // -----------------------------------------------------------
 
@@ -37,29 +37,34 @@
 #include <QString>
 #endif // !QSTRING_H
 
+// Include QUrl
+#ifndef QURL_H
+#include <QUrl>
+#endif // !QURL_H
+
 // Include QMap
 #ifndef QMAP_H
 #include <QMap>
 #endif // !QMAP_H
 
 // ===========================================================
-// Item
+// Image
 // ===========================================================
 
 namespace rss
 {
 
 	/**
-	  * Item - struct to store & manage RSS Channel's Item-Element data.
+	  * Image - struct to store Image RSS-Element data.
 	  *
 	  * @brief
-	  * Item contains sub-Elements, like <description>, <enclosure>, <guid>, etc.
+	  * Image - sub-Element of a Channel, has url, title, description, link, width & height sub-Elements.
 	  *
 	  * @version 1.0
 	  * @since 21.07.2019
 	  * @authors Denis Z. (code4un@yandex.ru)
 	**/
-	struct Item final : public Element
+	struct Image final : public Element
 	{
 
 		// -----------------------------------------------------------
@@ -76,61 +81,46 @@ namespace rss
 		// ===========================================================
 
 		/**
-		  * Item constructor.
+		  * Image constructor.
 		  *
 		  * @throws - no exceptions.
 		**/
-		explicit Item( ) noexcept;
+		explicit Image( ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR
 		// ===========================================================
 
 		/**
-		  * Item destructor.
+		  * Image destructor.
 		  *
 		  * @throws - no exceptions.
 		**/
-		virtual ~Item( ) noexcept final;
+		virtual ~Image( ) noexcept final;
 
 		// ===========================================================
 		// GETTERS & SETTERS
 		// ===========================================================
 
 		/**
-		  * Searches for a Element of Item.<br/>
-		  *
-		  * (?) To Convert QString || int to Element-Type, use Channel-class
-		  * or Element::Type directly.<br/>
+		  * Searches for a Element matching the given Element-Type.
 		  *
 		  * @threadsafe - not thread-safe.
-		  * @param pType - Element-Type.
+		  * @param elementType - Element-Type.
 		  * @return - Element, or null.
 		  * @throws - no exceptions.
 		**/
-		element_ptr_t getElement( const ElementType pType ) const noexcept;
+		element_ptr_t getElement( const ElementType elementType ) const noexcept;
 
 		/**
-		  * Sets Item's Element.
+		  * Sets (add, insert) Element.
 		  *
 		  * @threadsafe - not thread-safe.
-		  * @param pElement - Element to add.
-		  * @return - 'true' if set, 'false' if not (Element with the same type already set), or Item can't store this type.
+		  * @param pElement - Element.
+		  * @returns - 'true' if Element set, 'false' if not (other Element of the same type set, or invalid Element-Type).
 		  * @throws - no exceptions.
 		**/
 		bool setElement( element_ptr_t pElement ) noexcept;
-
-		// ===========================================================
-		// METHODS
-		// ===========================================================
-
-		/**
-		  * Deletes all Item's Elements.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @throws - no exceptions.
-		**/
-		void releaseElements( ) noexcept;
 
 		// -----------------------------------------------------------
 
@@ -149,24 +139,36 @@ namespace rss
 		// DELETED CONSTRUCTORS & OPERATORS
 		// ===========================================================
 
-		/** @deleted Item const copy constructor. **/
-		Item( const Item & ) noexcept = delete;
+		/** @deleted Image const copy constructor. **/
+		Image( const Image & ) noexcept = delete;
 
-		/** @deleted Item copy-assignment operator. **/
-		Item & operator=( const Item & ) noexcept = delete;
+		/** @deleted Image copy-assignment operator. **/
+		Image & operator=( const Image & ) noexcept = delete;
 
-		/** @deleted Item move constructor. **/
-		Item( Item && ) noexcept = delete;
+		/** @deleted Image move constructor. **/
+		Image( Image && ) noexcept = delete;
 
-		/** @deleted Item move assignment operator. **/
-		Item & operator=( Item && ) noexcept = delete;
+		/** @deleted Image move assignment operator. **/
+		Image & operator=( Image && ) noexcept = delete;
+
+		// ===========================================================
+		// METHODS
+		// ===========================================================
+
+		/**
+		  * Deletes Elements.
+		  *
+		  * @threadsafe - not thread-safe.
+		  * @throws - no exceptions.
+		**/
+		void releaseElements( ) noexcept;
 
 		// -----------------------------------------------------------
 
-	}; // rss::Item
+	}; // rss::Image
 
 } // rss
 
 // -----------------------------------------------------------
 
-#endif // !QRSS_READER_ITEM_HPP
+#endif // !QRSS_READER_IMAGE_HPP

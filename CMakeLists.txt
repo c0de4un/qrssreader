@@ -42,6 +42,17 @@ set ( QT_RSS_READER_PROJECT_HEADERS
     # MAIN
     "main.hpp"
     # RSS
+    "src/cpp/rss/Channel.hpp"
+    "src/cpp/rss/Item.hpp"
+    "src/cpp/rss/Integer.hpp"
+    "src/cpp/rss/Enclosure.hpp"
+    "src/cpp/rss/Text.hpp"
+    "src/cpp/rss/Date.hpp"
+    "src/cpp/rss/Link.hpp"
+    "src/cpp/rss/Cloud.hpp"
+    "src/cpp/rss/Source.hpp"
+    "src/cpp/rss/Image.hpp"
+    "src/cpp/rss/Element.hpp"
     "src/cpp/rss/ChannelModel.hpp"
     # UI
     "src/cpp/ui/MainWindowLogic.hpp"
@@ -57,6 +68,17 @@ set ( QT_RSS_READER_PROJECT_SOURCES
     # MAIN
     "main.cpp"
     # RSS
+    "src/cpp/rss/Channel.cpp"
+    "src/cpp/rss/Item.cpp"
+    "src/cpp/rss/Integer.cpp"
+    "src/cpp/rss/Enclosure.cpp"
+    "src/cpp/rss/Text.cpp"
+    "src/cpp/rss/Date.cpp"
+    "src/cpp/rss/Link.cpp"
+    "src/cpp/rss/Cloud.cpp"
+    "src/cpp/rss/Source.cpp"
+    "src/cpp/rss/Image.cpp"
+    "src/cpp/rss/Element.cpp"
     "src/cpp/rss/ChannelModel.cpp"
     # UI
     "src/cpp/ui/MainWindowLogic.cpp" )

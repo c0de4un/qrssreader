@@ -18,8 +18,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#ifndef QRSS_READER_ITEM_HPP
-#define QRSS_READER_ITEM_HPP
+#ifndef QRSS_READER_DATE_HPP
+#define QRSS_READER_DATE_HPP
 
 // -----------------------------------------------------------
 
@@ -37,100 +37,61 @@
 #include <QString>
 #endif // !QSTRING_H
 
-// Include QMap
-#ifndef QMAP_H
-#include <QMap>
-#endif // !QMAP_H
-
 // ===========================================================
-// Item
+// Date
 // ===========================================================
 
 namespace rss
 {
 
+	// -----------------------------------------------------------
+
 	/**
-	  * Item - struct to store & manage RSS Channel's Item-Element data.
+	  * Date - Date Element of RSS Channel & Item.
 	  *
 	  * @brief
-	  * Item contains sub-Elements, like <description>, <enclosure>, <guid>, etc.
+	  * Date - used by pubDate & lastBuildDate Elements.
+	  * Data stored with QString for easier cast (transformation).
 	  *
 	  * @version 1.0
 	  * @since 21.07.2019
 	  * @authors Denis Z. (code4un@yandex.ru)
 	**/
-	struct Item final : public Element
+	struct Date final : public Element
 	{
 
 		// -----------------------------------------------------------
 
 		// ===========================================================
-		// CONFIG
+		// CONSTANTS
 		// ===========================================================
 
-		/** Alias for Element pointer. **/
-		using element_ptr_t = Element*;
+		/** Date in QString format. **/
+		const QString mStringDate;
 
 		// ===========================================================
 		// CONSTRUCTOR
 		// ===========================================================
 
 		/**
-		  * Item constructor.
+		  * Date constructor.
 		  *
+		  * @param pDate - QString with Date.
+		  * @param pType - Element-Type, default is PubDate.
 		  * @throws - no exceptions.
 		**/
-		explicit Item( ) noexcept;
+		explicit Date( const QString & pDate, const Element::Type pType = Element::Type::PUB_DATE ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR
 		// ===========================================================
 
 		/**
-		  * Item destructor.
+		  * Date destructor.
 		  *
 		  * @throws - no exceptions.
 		**/
-		virtual ~Item( ) noexcept final;
-
-		// ===========================================================
-		// GETTERS & SETTERS
-		// ===========================================================
-
-		/**
-		  * Searches for a Element of Item.<br/>
-		  *
-		  * (?) To Convert QString || int to Element-Type, use Channel-class
-		  * or Element::Type directly.<br/>
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @param pType - Element-Type.
-		  * @return - Element, or null.
-		  * @throws - no exceptions.
-		**/
-		element_ptr_t getElement( const ElementType pType ) const noexcept;
-
-		/**
-		  * Sets Item's Element.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @param pElement - Element to add.
-		  * @return - 'true' if set, 'false' if not (Element with the same type already set), or Item can't store this type.
-		  * @throws - no exceptions.
-		**/
-		bool setElement( element_ptr_t pElement ) noexcept;
-
-		// ===========================================================
-		// METHODS
-		// ===========================================================
-
-		/**
-		  * Deletes all Item's Elements.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @throws - no exceptions.
-		**/
-		void releaseElements( ) noexcept;
+		virtual ~Date( ) noexcept final;
 
 		// -----------------------------------------------------------
 
@@ -139,34 +100,41 @@ namespace rss
 		// -----------------------------------------------------------
 
 		// ===========================================================
-		// FIELDS
-		// ===========================================================
-
-		/** Elements. **/
-		QMap<ElementType, element_ptr_t> elements;
-
-		// ===========================================================
 		// DELETED CONSTRUCTORS & OPERATORS
 		// ===========================================================
 
-		/** @deleted Item const copy constructor. **/
-		Item( const Item & ) noexcept = delete;
+		/** @deleted Date const copy constructor. **/
+		Date( const Date & ) noexcept = delete;
 
-		/** @deleted Item copy-assignment operator. **/
-		Item & operator=( const Item & ) noexcept = delete;
+		/** @deleted Date copy-assignment operator. **/
+		Date & operator=( const Date & ) noexcept = delete;
 
-		/** @deleted Item move constructor. **/
-		Item( Item && ) noexcept = delete;
+		/** @deleted Date move constructor. **/
+		Date( Date && ) noexcept = delete;
 
-		/** @deleted Item move assignment operator. **/
-		Item & operator=( Item && ) noexcept = delete;
+		/** @deleted Date move assignment operator. **/
+		Date & operator=( Date && ) noexcept = delete;
 
 		// -----------------------------------------------------------
 
-	}; // rss::Item
+	}; // rss::Date
+
+	// -----------------------------------------------------------
+
+	// ===========================================================
+	// Aliases
+	// ===========================================================
+
+	/** PubDate. **/
+	using PubDate = Date;
+
+	/** LastBuildDate. **/
+	using LastBuildDate = Date;
+
+	// -----------------------------------------------------------
 
 } // rss
 
 // -----------------------------------------------------------
 
-#endif // !QRSS_READER_ITEM_HPP
+#endif // !QRSS_READER_DATE_HPP

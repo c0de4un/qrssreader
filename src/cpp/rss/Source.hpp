@@ -18,8 +18,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#ifndef QRSS_READER_ITEM_HPP
-#define QRSS_READER_ITEM_HPP
+#ifndef QRSS_READER_SOURCE_HPP
+#define QRSS_READER_SOURCE_HPP
 
 // -----------------------------------------------------------
 
@@ -37,100 +37,69 @@
 #include <QString>
 #endif // !QSTRING_H
 
-// Include QMap
-#ifndef QMAP_H
-#include <QMap>
-#endif // !QMAP_H
+// Include QUrl
+#ifndef QURL_H
+#include <QUrl>
+#endif // !QURL_H
 
 // ===========================================================
-// Item
+// Source
 // ===========================================================
 
 namespace rss
 {
 
+	// -----------------------------------------------------------
+
 	/**
-	  * Item - struct to store & manage RSS Channel's Item-Element data.
+	  * Source - Source Element of RSS Channel & Item.
 	  *
 	  * @brief
-	  * Item contains sub-Elements, like <description>, <enclosure>, <guid>, etc.
+	  * Source - contains text & url. Same type as <category> element.
 	  *
 	  * @version 1.0
 	  * @since 21.07.2019
 	  * @authors Denis Z. (code4un@yandex.ru)
 	**/
-	struct Item final : public Element
+	struct Source final : public Element
 	{
 
 		// -----------------------------------------------------------
 
 		// ===========================================================
-		// CONFIG
+		// CONSTANTS
 		// ===========================================================
 
-		/** Alias for Element pointer. **/
-		using element_ptr_t = Element*;
+		/** Url. **/
+		const QUrl url;
+
+		/** Text. **/
+		const QString text;
 
 		// ===========================================================
 		// CONSTRUCTOR
 		// ===========================================================
 
 		/**
-		  * Item constructor.
+		  * Source constructor.
 		  *
+		  * @param pUrl - Url.
+		  * @param pText - Text.
+		  * @param elementType - Element-Type.
 		  * @throws - no exceptions.
 		**/
-		explicit Item( ) noexcept;
+		explicit Source( const QString & pUrl, const QString & pText, const ElementType elementType = ElementType::SOURCE ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR
 		// ===========================================================
 
 		/**
-		  * Item destructor.
+		  * Source destructor.
 		  *
 		  * @throws - no exceptions.
 		**/
-		virtual ~Item( ) noexcept final;
-
-		// ===========================================================
-		// GETTERS & SETTERS
-		// ===========================================================
-
-		/**
-		  * Searches for a Element of Item.<br/>
-		  *
-		  * (?) To Convert QString || int to Element-Type, use Channel-class
-		  * or Element::Type directly.<br/>
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @param pType - Element-Type.
-		  * @return - Element, or null.
-		  * @throws - no exceptions.
-		**/
-		element_ptr_t getElement( const ElementType pType ) const noexcept;
-
-		/**
-		  * Sets Item's Element.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @param pElement - Element to add.
-		  * @return - 'true' if set, 'false' if not (Element with the same type already set), or Item can't store this type.
-		  * @throws - no exceptions.
-		**/
-		bool setElement( element_ptr_t pElement ) noexcept;
-
-		// ===========================================================
-		// METHODS
-		// ===========================================================
-
-		/**
-		  * Deletes all Item's Elements.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @throws - no exceptions.
-		**/
-		void releaseElements( ) noexcept;
+		virtual ~Source( ) noexcept final;
 
 		// -----------------------------------------------------------
 
@@ -139,34 +108,38 @@ namespace rss
 		// -----------------------------------------------------------
 
 		// ===========================================================
-		// FIELDS
-		// ===========================================================
-
-		/** Elements. **/
-		QMap<ElementType, element_ptr_t> elements;
-
-		// ===========================================================
 		// DELETED CONSTRUCTORS & OPERATORS
 		// ===========================================================
 
-		/** @deleted Item const copy constructor. **/
-		Item( const Item & ) noexcept = delete;
+		/** @deleted Source const copy constructor. **/
+		Source( const Source & ) noexcept = delete;
 
-		/** @deleted Item copy-assignment operator. **/
-		Item & operator=( const Item & ) noexcept = delete;
+		/** @deleted Source copy-assignment operator. **/
+		Source & operator=( const Source & ) noexcept = delete;
 
-		/** @deleted Item move constructor. **/
-		Item( Item && ) noexcept = delete;
+		/** @deleted Source move constructor. **/
+		Source( Source && ) noexcept = delete;
 
-		/** @deleted Item move assignment operator. **/
-		Item & operator=( Item && ) noexcept = delete;
+		/** @deleted Source move assignment operator. **/
+		Source & operator=( Source && ) noexcept = delete;
 
 		// -----------------------------------------------------------
 
-	}; // rss::Item
+	}; // rss::Source
+
+	// -----------------------------------------------------------
+
+	// ===========================================================
+	// ALIASES
+	// ===========================================================
+
+	/** Category. **/
+	using Category = Source;
+
+	// -----------------------------------------------------------
 
 } // rss
 
 // -----------------------------------------------------------
 
-#endif // !QRSS_READER_ITEM_HPP
+#endif // !QRSS_READER_SOURCE_HPP

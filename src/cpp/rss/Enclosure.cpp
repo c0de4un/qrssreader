@@ -25,67 +25,12 @@
 // ===========================================================
 
 // HEADER
-#ifndef Q_RSS_READER_CHANNEL_MODEL_HPP
-#include "ChannelModel.hpp"
-#endif // !Q_RSS_READER_CHANNEL_MODEL_HPP
-
-// Debug-version includes those within header.
-#if !defined( QT_DEBUG ) && !defined( DEBUG ) // RELEASE
-
-// Include rss::Channel
-#ifndef QRSS_READER_CHANNEL_HPP
-#include "Channel.hpp"
-#endif // !QRSS_READER_CHANNEL_HPP
-
-// Include rss::Category
-#ifndef QRSS_READER_SOURCE_HPP
-#include "Source.hpp"
-#endif // !QRSS_READER_SOURCE_HPP
-
-// Include rss::Cloud
-#ifndef QRSS_READER_CLOUD_HPP
-#include "Cloud.hpp"
-#endif // !QRSS_READER_CLOUD_HPP
-
-// Include rss::Date
-#ifndef QRSS_READER_DATE_HPP
-#include "Date.hpp"
-#endif // !QRSS_READER_DATE_HPP
-
-// Include rss::Enclosure
 #ifndef QRSS_READER_ENCLOSURE_HPP
 #include "Enclosure.hpp"
 #endif // !QRSS_READER_ENCLOSURE_HPP
 
-// Include rss::Integer
-#ifndef QRSS_READER_INTEGER_HPP
-#include "Integer.hpp"
-#endif // !QRSS_READER_INTEGER_HPP
-
-// Include rss::Item
-#ifndef QRSS_READER_ITEM_HPP
-#include "Item.hpp"
-#endif // !QRSS_READER_ITEM_HPP
-
-// Include rss::Image
-#ifndef QRSS_READER_IMAGE_HPP
-#include "Image.hpp"
-#endif // !QRSS_READER_IMAGE_HPP
-
-// Include rss::Link
-#ifndef QRSS_READER_LINK_HPP
-#include "Link.hpp"
-#endif // !QRSS_READER_LINK_HPP
-
-// Include rss::Text
-#ifndef QRSS_READER_TEXT_HPP
-#include "Text.hpp"
-#endif // !QRSS_READER_TEXT_HPP
-
-#endif // RELEASE
-
 // ===========================================================
-// ChannelModel
+// Enclosure
 // ===========================================================
 
 namespace rss
@@ -98,54 +43,51 @@ namespace rss
 	// ===========================================================
 
 	/**
-	  * ChannelModel constructor.
+	  * Enclosure constructor.
 	  *
-	  * @param qParent - Parent-Object. default is null.
+	  * @param pUrl - Url to a data.
+	  * @param pLength - data length in bytes.
+	  * @param mimeType - MIME-Type.
 	  * @throws - no exceptions.
 	**/
-	ChannelModel::ChannelModel( QObject *const qParent ) noexcept
-		: QAbstractItemModel( qParent )
-	{
-	}
+	Enclosure::Enclosure( const QString & pUrl, const QString & pLength, const QString & mimeType ) noexcept
+		: Element( Element::Type::ENCLOSURE ),
+		  url( pUrl ),
+		  length( pLength.toLongLong( ) ),
+		  type( getMimeTypeFromString( mimeType ) )
+	{ }
 
 	// ===========================================================
 	// DESTRUCTOR
 	// ===========================================================
 
 	/**
-	  * ChannelModel destructor.
+	  * Enclosure destructor.
 	  *
 	  * @throws - no exceptions.
 	**/
-	ChannelModel::~ChannelModel( ) noexcept = default;
+	Enclosure::~Enclosure( ) noexcept = default;
 
 	// ===========================================================
-	// METHODS
-	// ===========================================================
-
-	// ===========================================================
-	// OVERRIDE
+	// GETTERS & SETTERS
 	// ===========================================================
 
 	/**
-	  * Sets Item-Data.
+	  * Converts (casts) QString of MIME-TYPE Name to a QMimeType.
 	  *
-	  * @thread_safety - thread-lock used & signals/slots.
-	  * @param modelIndex - Item Model Index.
-	  * @param pValue - value to set.
-	  * @param pRole - Role.
-	  * @return - 'true' if OK, 'false' data not set.
+	  * @thread_safety - not required.
+	  * @param mimeType - QString with a Name of QMimeType.
+	  * @returns - QMimeType.
 	  * @throws - no exceptions.
 	**/
-	bool ChannelModel::setData( const QModelIndex & modelIndex, const QVariant & pValue, const int pRole )
+	QMimeType Enclosure::getMimeTypeFromString( const QString & mimeType ) noexcept
 	{
 
-#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-		//
-#endif // DEBUG
+		// Get QMimeDatabase
+		QMimeDatabase mimeDB;
 
-		// Return FALSE
-		return( false );
+		// Convert QString to QMimeType
+		return( mimeDB.mimeTypeForName( mimeType ) );
 
 	}
 

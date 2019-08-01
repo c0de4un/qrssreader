@@ -23,6 +23,11 @@
 //#include "src/cpp/ui/UrlInputDialog.hpp"
 #endif // !QT_RSS_READER_URL_INPUT_DIALOG_HPP
 
+// Include rss::ChannelModel
+#ifndef Q_RSS_READER_CHANNEL_MODEL_HPP
+#include "src/cpp/rss/ChannelModel.hpp"
+#endif // !Q_RSS_READER_CHANNEL_MODEL_HPP
+
 /**
   * Returns path to dir where app can store private-files.
   *
