@@ -77,7 +77,7 @@ namespace rss
 	  * @since 21.07.2019
 	  * @authors Denis Z. (code4un@yandex.ru)
 	**/
-	class Channel final
+	class Channel final : public Element
 	{
 
 	public:

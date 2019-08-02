@@ -56,6 +56,8 @@ set ( QT_RSS_READER_PROJECT_HEADERS
     "src/cpp/rss/ChannelModel.hpp"
     # UI
     "src/cpp/ui/MainWindowLogic.hpp"
+    # UTILS
+    "src/cpp/utils/IDStorage.hpp"
     # QML Resources
     "qml.qrc" )
 

@@ -55,7 +55,8 @@ namespace rss
 	  * @throws - no exceptions.
 	**/
 	Channel::Channel( ) noexcept
-		: mElements( ),
+		: Element( ElementType::CHANNEL ),
+		  mElements( ),
 		  mElementsMutex( ),
 		  mItems( ),
 		  mItemsMutex( )
@@ -301,7 +302,7 @@ namespace rss
 		{
 
 			// Comparison
-			if ( static_cast<GUID*>( item_->getElement( ElementType::GUID ) )->mData == pGUID )
+			if ( static_cast<rss::GUID*>( item_->getElement( ElementType::GUID ) )->mData == pGUID )
 				return( item_ );
 
 		} /// Search Item
@@ -329,7 +330,7 @@ namespace rss
 		QMutexLocker threadLock( &mItemsMutex );
 
 		// Get GUID
-		const GUID *const guid_ptr( static_cast<GUID*>( pItem->getElement( ElementType::GUID ) ) );
+		const rss::GUID *const guid_ptr( static_cast<rss::GUID*>( pItem->getElement( ElementType::GUID ) ) );
 
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
 		// Check GUID

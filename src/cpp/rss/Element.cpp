@@ -38,6 +38,13 @@ namespace rss
 
     // -----------------------------------------------------------
 
+	// ===========================================================
+	// FIELDS
+	// ===========================================================
+
+	/** Elements ID Storage. **/
+	IDStorage<unsigned long> Element::mElementsIDStorage;
+
     // ===========================================================
     // CONSTRUCTOR
     // ===========================================================
@@ -49,7 +56,8 @@ namespace rss
       * @throws - no exceptions.
     **/
     Element::Element( const Element::Type pType ) noexcept
-        : mType( pType )
+		: id( mElementsIDStorage.generateID( ) ),
+		  mType( pType )
     {
     }
 
@@ -62,7 +70,13 @@ namespace rss
       *
       * @throws - no exceptions.
     **/
-    Element::~Element( ) noexcept = default;
+	Element::~Element( ) noexcept
+	{
+
+		// Release ID
+		mElementsIDStorage.releaseID( id );
+
+	}
 
     // ===========================================================
     // METHODS

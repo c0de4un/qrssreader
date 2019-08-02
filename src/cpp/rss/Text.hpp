@@ -139,6 +139,9 @@ namespace rss
 	/** GUID **/
 	using GUID = Text;
 
+	/**  Language. **/
+	using Language = Text;
+
 	// -----------------------------------------------------------
 
 } // rss

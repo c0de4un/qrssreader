@@ -27,6 +27,11 @@
 // INCLUDES
 // ===========================================================
 
+// Include rss::IDStorage
+#ifndef QRSS_READER_ID_STORAGE_HPP
+#include "../utils/IDStorage.hpp"
+#endif // !QRSS_READER_ID_STORAGE_HPP
+
 // ===========================================================
 // FORWARD-DECLARATIONS
 // ===========================================================
@@ -150,15 +155,31 @@ namespace rss
 			SOURCE = 23,
 
 			/** Comments. **/
-			COMMENTS = 24
+			COMMENTS = 24,
+
+			/** RSS Channel. **/
+			CHANNEL = 25,
+
+			/** RSS Channel Item. **/
+			ITEM = 26
 
             // -----------------------------------------------------------
 
         }; // Element::Type
 
+		// ===========================================================
+		// CONFIGS
+		// ===========================================================
+
+		/** Element ID Type. **/
+		using element_id_t = unsigned long;
+
         // ===========================================================
         // CONSTANTS
         // ===========================================================
+
+		/** ID. **/
+		const element_id_t id;
 
         /** Type. **/
         const Element::Type mType;
@@ -206,6 +227,13 @@ namespace rss
     private:
 
         // -----------------------------------------------------------
+
+		// ===========================================================
+		// FIELDS
+		// ===========================================================
+
+		/** Elements ID Storage. **/
+		static IDStorage<unsigned long> mElementsIDStorage;
 
         // ===========================================================
         // DELETED CONSTRUCTORS & OPERATORS
