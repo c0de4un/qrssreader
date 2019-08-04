@@ -47,11 +47,12 @@ namespace rss
 	  *
 	  * @param pUrl - Url.
 	  * @param pText - Text.
+	  * @param parentElement - Parent-Element.
 	  * @param elementType - Element-Type.
 	  * @throws - no exceptions.
 	**/
-	Source::Source( const QString & pUrl, const QString & pText, const ElementType elementType ) noexcept
-		: Element( elementType ),
+	Source::Source( const QString & pUrl, const QString & pText, Element *const parentElement, const ElementType elementType ) noexcept
+		: Element( elementType, parentElement ),
 		  url( pUrl ),
 		  text( pText )
 	{ }

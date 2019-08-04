@@ -46,11 +46,12 @@ namespace rss
 	  * Text constructor.
 	  *
 	  * @param pData - QString with Text-Data. (!) Value moved.
+	  * @param parentElement - Parent-Element.
 	  * @param pType - Emelent-Type (Description).
 	  * @throws - no exceptions.
 	**/
-	Text::Text( const QString & pData, const Element::Type pType ) noexcept
-		: Element( pType ),
+	Text::Text( const QString & pData, Element *const parentElement, const Element::Type pType ) noexcept
+		: Element( pType, parentElement ),
 		  mData( pData )
 	{
 	}

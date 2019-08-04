@@ -46,15 +46,16 @@ namespace rss
 	  * Enclosure constructor.
 	  *
 	  * @param pUrl - Url to a data.
+	  * @param parentElement - Parent-Element.
 	  * @param pLength - data length in bytes.
 	  * @param mimeType - MIME-Type.
 	  * @throws - no exceptions.
 	**/
-	Enclosure::Enclosure( const QString & pUrl, const QString & pLength, const QString & mimeType ) noexcept
-		: Element( Element::Type::ENCLOSURE ),
+	Enclosure::Enclosure( const QString & pUrl, Element *const parentElement, const QString & pLength, const QString & mimeType ) noexcept
+		: Element( Element::Type::ENCLOSURE, parentElement ),
 		  url( pUrl ),
 		  length( pLength.toLongLong( ) ),
-		  type( getMimeTypeFromString( mimeType ) )
+		  mimeType( getMimeTypeFromString( mimeType ) )
 	{ }
 
 	// ===========================================================

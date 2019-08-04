@@ -55,7 +55,7 @@ namespace rss
 	  * @throws - no exceptions.
 	**/
 	Channel::Channel( ) noexcept
-		: Element( ElementType::CHANNEL ),
+		: Element( ElementType::CHANNEL, nullptr ),
 		  mElements( ),
 		  mElementsMutex( ),
 		  mItems( ),
@@ -113,6 +113,27 @@ namespace rss
 	} /// Channel::getElement
 
 	/**
+	  * Searches for a Item.
+	  *
+	  * @threadsafe - thread-lock used.
+	  * @param pIndex - Item index.
+	  * @returns - Item, or null.
+	  * @throws - no exceptions.
+	**/
+	Channel::item_ptr_t Channel::getItem( const int pIndex ) const noexcept
+	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Check range.
+		assert( pIndex < mItems.size( ) && "Channel::getItem - Item index is out of the range !" );
+#endif // DEBUG
+
+		// Return Item.
+		return( mItems.at( pIndex ) );
+
+	} /// Channel::getItem
+
+	/**
 	  * Returns 'true' if RSS Channel's Item with the given GUID found.
 	  *
 	  * @threadsafe - thread-lock used.
@@ -120,7 +141,7 @@ namespace rss
 	  * @return - 'true' if Item found, 'false' if not.
 	  * @throws - no exceptions.
 	**/
-	bool Channel::hasItem( const QString & pGUID ) noexcept
+	bool Channel::hasItemGUID( const QString & pGUID ) noexcept
 	{
 
 		// Thread-Lock.
@@ -164,7 +185,7 @@ namespace rss
 		QMutexLocker uniqueLock( &mElementsMutex );
 
 		// Search Element.
-		const auto elementPos_ = mElements.find( pElement->mType );
+		const auto elementPos_ = mElements.find( pElement->type );
 
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
 		// Check Element Repeat.
@@ -176,7 +197,7 @@ namespace rss
 #endif // DEBUG
 
 		// Add Element.
-		mElements.insert( pElement->mType, pElement );
+		mElements.insert( pElement->type, pElement );
 
 		// Return TRUE
 		return( true );
@@ -287,6 +308,26 @@ namespace rss
 	// ===========================================================
 
 	/**
+	  * Returns 'true' if this Element don't have sub-Elements.
+	  *
+	  * @threadsafe - not thread-safe.
+	  * @return - 'true' if Empty, 'false' if have sub-Elements.
+	  * @throws - no exceptions.
+	**/
+	bool Channel::empty( ) const noexcept
+	{ return( mElements.empty( ) ); }
+
+	/**
+	  * Count sub-Elements.
+	  *
+	  * @threadsafe - not thread-safe.
+	  * @return - number of sub-Elements.
+	  * @throws - no exceptions.
+	**/
+	int Channel::count( ) const noexcept
+	{ return( mItems.size( ) ); }
+
+	/**
 	  * Searches for a Item with the specific GUID.
 	  *
 	  * @threadsafe - must be called only when thread-lock is active.
@@ -320,7 +361,7 @@ namespace rss
 	  * @threadsafe - thread-lock used.
 	  * @param pItem - Item.
 	  * @return - 'true' if added, 'false' if Item with the same GUID already added.</br>
-	  * Use #hasItem(const QString&) method.
+	  * Use #hasItemGUID(const QString&) method.
 	  * @throws - no exceptions.
 	**/
 	bool Channel::addItem( Channel::item_ptr_t pItem ) noexcept
@@ -334,18 +375,18 @@ namespace rss
 
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
 		// Check GUID
-		assert( guid_ptr->mType == ElementType::GUID && "Channel::addItem - bad cast." );
+		assert( guid_ptr->type == ElementType::GUID && "Channel::addItem - bad cast." );
 
 		// Check Repeats
-		assert( !hasItem( guid_ptr->mData ) && "Channel::addItem - Channel already have Item with the same GUID !" );
+		assert( !hasItemGUID(  guid_ptr->mData ) && "Channel::addItem - Channel already have Item with the same GUID !" );
 #else // !DEBUG
 		// Stop, if Item with the same GUID found.
-		if ( hasItem( guid_ptr->mData ) )
+		if ( hasItemGUID( guid_ptr->mData ) )
 			return( false );
 #endif // DEBUG
 
 		// Add Item.
-		mItems.push_front( pItem );
+		mItems.push_back( pItem );
 
 		// Return TRUE
 		return( true );

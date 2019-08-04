@@ -46,14 +46,15 @@ namespace rss
 	  * Cloud constructor.
 	  *
 	  * @param pDomain - Url to RSS-Cloud Web-Service (HTTP-POST, XML-RPC or SOAP 1.1).
+	  * @param parentElement - Parent-Element.
 	  * @param pPort - Port.
 	  * @param pPath - Path.
 	  * @param registerProcedure - Register Procedure Name.
 	  * @param pProtocol - Protocol (xml-rpc, soap, etc).
 	  * @throws - no exceptions.
 	**/
-	Cloud::Cloud( const QString & pDomain_, const int pPort_, const QString & pPath_, const QString registerProcedure_, const QString pProtocol_ ) noexcept
-		: Element ( Element::Type::CLOUD ),
+	Cloud::Cloud( const QString & pDomain_, Element *const parentElement, const int pPort_, const QString & pPath_, const QString registerProcedure_, const QString pProtocol_ ) noexcept
+		: Element ( Element::Type::CLOUD, parentElement ),
 		  domain( pDomain_ ),
 		  port( pPort_ ),
 		  path( pPath_ ),
@@ -65,14 +66,15 @@ namespace rss
 	  * Cloud constructor.
 	  *
 	  * @param pDomain - Url to RSS-Cloud Web-Service (HTTP-POST, XML-RPC or SOAP 1.1).
+	  * @param parentElement - Parent-Element.
 	  * @param pPort - Port.
 	  * @param pPath - Path.
 	  * @param registerProcedure - Register Procedure Name.
 	  * @param pProtocol - Protocol (xml-rpc, soap, etc).
 	  * @throws - no exceptions.
 	**/
-	Cloud::Cloud( const QUrl & pDomain_, const int pPort_, const QString & pPath_, const QString registerProcedure_, const QString pProtocol_ ) noexcept
-		: Element ( Element::Type::CLOUD ),
+	Cloud::Cloud( const QUrl & pDomain_, Element *const parentElement, const int pPort_, const QString & pPath_, const QString registerProcedure_, const QString pProtocol_ ) noexcept
+		: Element ( Element::Type::CLOUD, parentElement ),
 		  domain( pDomain_ ),
 		  port( pPort_ ),
 		  path( pPath_ ),

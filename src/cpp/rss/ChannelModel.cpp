@@ -119,14 +119,7 @@ namespace rss
 	  * @throws - no exceptions.
 	**/
 	QVariant ChannelModel::getChannelData( rss::Channel *const pChannel, const int pRole ) const noexcept
-	{// TODO ChannelModel::getChannelData
-
-#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-
-		// Debug-flag, that data-role handled.
-		bool roleHandled( false );
-
-#endif // DEBUG
+	{
 
 		// Handle Data-Role
 		switch( pRole )
@@ -135,7 +128,7 @@ namespace rss
 		// ==================== Required elements. ====================
 
 		// [<title>] Title (DisplayRole)
-		case rss::ChannelModel::Roles::CHANNEL_TITLE_ROLE:
+		case rss::ChannelModel::Roles::RSS_TITLE_ELEMENT_ROLE:
 		{
 
 			// Get Title-Element of Channel.
@@ -144,6 +137,10 @@ namespace rss
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
 			// Null-Check
 			assert( titleElement != nullptr && "ChannelModel::getChannelData - RSS Channel must have Title-Element !" );
+#else // !DEBUG
+			// Return invalid QVariant
+			if ( titleElement == nullptr )
+				return( QVariant( ) );
 #endif // DEBUG
 
 			// Return Title
@@ -152,7 +149,7 @@ namespace rss
 		} /// Title [<title>]
 
 		// Link [<link>]
-		case rss::ChannelModel::Roles::CHANNEL_LINK_ROLE:
+		case rss::ChannelModel::Roles::RSS_LINK_ELEMENT_ROLE:
 		{
 
 			// Get Link-Element.
@@ -161,6 +158,10 @@ namespace rss
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
 			// Null-Check
 			assert( link != nullptr && "ChannelModel::getChannelData - RSS Channel must have Link-Element !" );
+#else // !DEBUG
+			// Return invalid QVariant
+			if ( link == nullptr )
+				return( QVariant( ) );
 #endif // DEBUG
 
 			// Return Link URL
@@ -169,7 +170,7 @@ namespace rss
 		} /// Link [<link>]
 
 		// Description [<description>]
-		case rss::ChannelModel::Roles::CHANNEL_DESCRIPTION_ROLE:
+		case rss::ChannelModel::Roles::RSS_DESCRIPTION_ELEMENT_ROLE:
 		{
 
 			// Get Link-Element.
@@ -178,6 +179,10 @@ namespace rss
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
 			// Null-Check
 			assert( desc != nullptr && "ChannelModel::getChannelData - RSS Channel must have Description-Element !" );
+#else // !DEBUG
+			// Return invalid QVariant
+			if ( desc == nullptr )
+				return( QVariant( ) );
 #endif // DEBUG
 
 			// Return Link URL
@@ -188,72 +193,129 @@ namespace rss
 		// ==================== Not required elements. ====================
 
 		// Language [<language>]
-		case rss::ChannelModel::Roles::CHANNEL_LANGUAGE_ROLE:
+		case rss::ChannelModel::Roles::RSS_LANGUAGE_ELEMENT_ROLE:
 		{
 
 			// Get Language-Element.
 			rss::Language *const language( static_cast<rss::Language*>( pChannel->getElement( rss::ElementType::LANGUAGE ) ) );
+
+			// Return invalid QVariant
+			if ( language == nullptr )
+				return( QVariant( ) );
 
 			// Return Language-Element value.
 			return( QVariant( language->mData ) );
 
 		} /// Language [<language>]
 
-		// Image (checks if <image> element exists).
-		case rss::ChannelModel::Roles::IMAGE_EXISTS_ROLE:
+		// [<image url="">] Image Url
+		case rss::ChannelModel::Roles::RSS_IMAGE_ELEMENT_ROLE:
 		{
 
-			// Get Image Element
-			rss::Image *const image_ptr( static_cast<rss::Image*>( pChannel->getElement( rss::ElementType::IMAGE ) ) );
+			// Get Image-Element.
+			rss::Image *const image( static_cast<rss::Image*>( pChannel->getElement( rss::ElementType::IMAGE ) ) );
 
-			// Return TRUE if Image Element exists.
-			return( QVariant( image_ptr != nullptr ) );
+			// Return invalid QVariant, if Image Element not found.
+			if ( image == nullptr )
+				return( QVariant( ) );
 
-		}
+			// Return Image Url
+			return( QVariant( image->url ) );
 
-		// Image Url <image><url></image>
-		case rss::ChannelModel::Roles::IMAGE_URL_ROLE:
+		} /// [<image url="">] Image Url
+
+		// [<image><width /></image>] Image Width
+		case rss::ChannelModel::Roles::RSS_IMAGE_WIDTH_ELEMENT_ROLE:
 		{
 
-			// Get Image Element
-			rss::Image *const image_ptr( static_cast<rss::Image*>( pChannel->getElement( rss::ElementType::IMAGE ) ) );
+			// Get Image-Element.
+			rss::Image *const image( static_cast<rss::Image*>( pChannel->getElement( rss::ElementType::IMAGE ) ) );
 
-#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-			// Null-Check
-			assert( image_ptr != nullptr && "ChannelModel::getChannelData - Image-Element not found ! Use DecorationRole (or CHANNEL_IMAGE_ROLE, or IMAGE_EXISTS_ROLE) to get bool-flag !" );
-#else // !DEBUG
-			// Return null if Image Element not found.
-			if ( image_ptr == nullptr )
-				return( QVariant( QUrl( nullptr ) ) );
-#endif // DEBUG
+			// Return invalid QVariant, if Image Element not found.
+			if ( image == nullptr )
+				return( QVariant( ) );
 
-			// Get Image Url (Link) Element
-			rss::Url *const url_ptr( static_cast<rss::Url*>( image_ptr->getElement( ElementType::URL ) ) );
+			// Return Image Width, or invalid QVariant if not set.
+			return( image->width > 0 ? QVariant( image->width ) : QVariant( ) );
 
-#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-			// Null-Check
-			assert( image_ptr != nullptr && "ChannelModel::getChannelData - Image Url Element not found !" );
-#endif // DEBUG
+		} /// [<image><width /></image>] Image Width
 
-			// Return Image.Url
-			return( QVariant( url_ptr->mUrl ) );
+		// [<image><height /></image>] Image Height
+		case rss::ChannelModel::Roles::RSS_IMAGE_HEIGHT_ELEMENT_ROLE:
+		{
 
-		} /// Image Url <image><url></image>
+			// Get Image-Element.
+			rss::Image *const image( static_cast<rss::Image*>( pChannel->getElement( rss::ElementType::IMAGE ) ) );
 
+			// Return invalid QVariant, if Image Element not found.
+			if ( image == nullptr )
+				return( QVariant( ) );
+
+			// Return Image Height, or invalid QVariant if not set.
+			return( image->height > 0 ? QVariant( image->height ) : QVariant( ) );
+
+		} /// [<image><height /></image>] Image Height
+
+		// [<image><link /></image>] Image Link
+		case rss::ChannelModel::Roles::RSS_IMAGE_LINK_ELEMENT_ROLE:
+		{
+
+			// Get Image-Element.
+			rss::Image *const image( static_cast<rss::Image*>( pChannel->getElement( rss::ElementType::IMAGE ) ) );
+
+			// Return invalid QVariant, if Image Element not found.
+			if ( image == nullptr || image->link == nullptr )
+				return( QVariant( ) );
+
+			// Return Image Link.
+			return( QVariant( *image->link ) );
+
+		} /// [<image><link /></image>] Image Link
+
+		// [<image><description /></image>] Image Description
+		case rss::ChannelModel::Roles::RSS_IMAGE_DESCRIPTION_ELEMENT_ROLE:
+		{
+
+			// Get Image-Element.
+			rss::Image *const image( static_cast<rss::Image*>( pChannel->getElement( rss::ElementType::IMAGE ) ) );
+
+			// Return invalid QVariant, if Image Element not found.
+			if ( image == nullptr || image->description == nullptr )
+				return( QVariant( ) );
+
+			// Return Description.
+			return( QVariant( *image->description ) );
+
+		} /// [<image><description /></image>] Image Description
+
+		// [<lastBuildDate>] Last Build Date.
+		case rss::ChannelModel::Roles::RSS_LAST_BUILD_DATE_ELEMENT_ROLE:
+		{
+
+			// Get LastBuildDate Element.
+			rss::LastBuildDate *const buildDate( static_cast<rss::LastBuildDate*>( pChannel->getElement( rss::ElementType::LAST_BUILD_DATE ) ) );
+
+			// Return invalid QVariant if element not found.
+			if ( buildDate == nullptr )
+				return( QVariant( ) );
+
+			// Return Channel Last Build Date as QString.
+			return( QVariant( buildDate->mStringDate ) );
+
+		} /// [<lastBuildDate>] Last Build Date.
+
+		// []
+
+		// Default
 		default:
 		{
 
-			// Return
-			return( QVariant( QString( "error, unsupported data type." ) ) );
+			// Return invalid QVariant.
+			return( QVariant( ) );
 
-		}
+		} /// Default
 
 		} /// Handle Data-Role
-
-#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-		// Check if data-role handled.
-		assert( roleHandled && "ChannelModel::getChannelData - Role not handled ! Data-type not supported ?" );
-#endif // DEBUG
 
 	} /// ChannelModel::getChannelData
 
@@ -267,14 +329,7 @@ namespace rss
 	  * @throws - no exceptions.
 	**/
 	QVariant ChannelModel::getItemData( rss::Item *const pItem, const int pRole ) const noexcept
-	{// TODO ChannelModel::getItemData
-
-#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-
-		// Debug-flag, that data-role handled.
-		bool roleHandled( false );
-
-#endif // DEBUG
+	{
 
 		// Handle Item Data-Role.
 		switch( pRole )
@@ -282,77 +337,113 @@ namespace rss
 
 		// ======================= Required Elements =======================
 
-		// <title>
-		case rss::ChannelModel::Roles::TITLE_ROLE:
+		// [<title>] Title
+		case rss::ChannelModel::Roles::RSS_TITLE_ELEMENT_ROLE:
 		{
 
 			// Get Title Element.
-			rss::Title *const title_ptr( static_cast<rss::Title*>( pItem->getElement( ElementType::TITLE ) ) );
+			rss::Title *const title( static_cast<rss::Title*>( pItem->getElement( rss::ElementType::TITLE ) ) );
 
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-			// Null-check
-			assert( title_ptr != nullptr && "ChannelModel::getItemData - title element not found !" );
+			// Check Title.
+			assert( title != nullptr && "ChannelModel::getItemData - Title Element not found !" );
 #endif // DEBUG
+
+			// Return invalid QVariant, if element not found.
+			if ( title == nullptr )
+				return( QVariant( ) );
 
 			// Return Title.
-			return( QVariant( title_ptr->mData ) );
+			return( QVariant( title->mData ) );
 
-		}
+		} /// [<title>] Title
 
-		// <link>
-		case rss::ChannelModel::Roles::LINK_ROLE:
+		// [<description>] Description
+		case rss::ChannelModel::Roles::RSS_DESCRIPTION_ELEMENT_ROLE:
 		{
 
-			// Get Link Element.
-			rss::Link *const link( static_cast<rss::Link*>( pItem->getElement( ElementType::LINK ) ) );
+			// Get Description Element.
+			rss::Description *const description( static_cast<rss::Description*>( pItem->getElement( rss::ElementType::DESCRITION ) ) );
 
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-			// Null-check
-			assert( link != nullptr && "ChannelModel::getItemData - link element not found !" );
+			// Check Description.
+			assert( description != nullptr && "ChannelModel::getItemData - Description Element not found !" );
 #endif // DEBUG
 
-			// Return Link value.
-			return( QVariant( link->mUrl ) );
-
-		}
-
-		// <description>
-		case rss::ChannelModel::Roles::DESCRIPTION_ROLE:
-		{
-
-			// Get Description-Element.
-			rss::Description *const description( static_cast<rss::Description*>( pItem->getElement( ElementType::DESCRITION ) ) );
-
-#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-			// Null-check
-			assert( description != nullptr && "ChannelModel::getItemData - description element not found !" );
-#endif // DEBUG
+			// Return invalid QVariant, if element not found.
+			if ( description == nullptr )
+				return( QVariant( ) );
 
 			// Return Description.
 			return( QVariant( description->mData ) );
 
-		}
+		} /// [<description>] Description
+
+		// [<link>] Link
+		case rss::ChannelModel::Roles::RSS_LINK_ELEMENT_ROLE:
+		{
+
+			// Get Link Element.
+			rss::Link *const link( static_cast<rss::Link*>( pItem->getElement( rss::ElementType::LINK ) ) );
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+			// Check Description.
+			assert( link != nullptr && "ChannelModel::getItemData - Link Element not found !" );
+#endif // DEBUG
+
+			// Return invalid QVariant, if element not found.
+			if ( link == nullptr )
+				return( QVariant( ) );
+
+			// Return Link.
+			return( QVariant( link->mUrl ) );
+
+		} /// [<link>] Link
 
 		// ======================= Additional (Optional) Elements =======================
+
+		// [<pubDate>] Publication Date.
+		case rss::ChannelModel::Roles::RSS_PUB_DATE_ELEMENT_ROLE:
+		{
+
+			// Get PubDate Element.
+			rss::PubDate *const pubDate( static_cast<rss::PubDate*>( pItem->getElement( rss::ElementType::PUB_DATE ) ) );
+
+			// Reutrn invalid QVariant, if element not found.
+			if ( pubDate == nullptr )
+				return( QVariant( ) );
+
+			// Return PubDate Element value.
+			return( QVariant( pubDate->mStringDate ) );
+
+		} /// [<pubDate>] Publication Date.
+
+		// [<guid>] GUID
+		case rss::ChannelModel::Roles::RSS_GUID_ELEMENT_ROLE:
+		{
+
+			// Get GUID Element.
+			rss::GUID *const guid( static_cast<rss::GUID*>( pItem->getElement( rss::ElementType::GUID ) ) );
+
+			// Reutrn invalid QVariant, if element not found.
+			if ( guid == nullptr )
+				return( QVariant( ) );
+
+			// Return GUID Element value.
+			return( QVariant( guid->mData ) );
+
+		} /// [<guid>] GUID
 
 		// Default
 		default:
 		{
 
-			// Return error
-			return( QVariant( QString( "error" ) ) );
+			// Return invalid QVariant.
+			return( QVariant( ) );
 
 		} /// Default
 
 		} /// Handle Item Data-Role.
-
-#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-		// Check if data-role handled.
-		assert( roleHandled && "ChannelModel::getItemData - Role not handled ! Data-type not supported ?" );
-#endif // DEBUG
-
-		// Return empty
-		return( QVariant( QString( "" ) ) ); // Unreachable
 
 	} /// ChannelModel::getItemData
 
@@ -401,16 +492,24 @@ namespace rss
 	QVariant ChannelModel::data( const QModelIndex & pIndex, int pRole ) const
 	{
 
-#if defined( QT_DEFINED ) || defined( DEBUG ) // DEBUG
-		// Null-Check.
-		assert( pIndex.internalPointer( ) != nullptr && "ChannelModel::data - invalid Model-Index data, it must contain an object, inherited from rss::Element !" );
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Check Model-Index.
+		assert( pIndex.isValid( ) && "ChannelModel::data - invalid Model-Index ! Root can't provide any data to display." );
+#else // !DEBUG
+		// Cancel, if invalid Model-Index.
+		if ( !pIndex.isValid( ) )
+			return( QVariant( ) );
 #endif // DEBUG
 
 		// Get rss::Element
 		Element *const elementPtr( static_cast<Element*>( pIndex.internalPointer( ) ) );
 
+		// Cancel, if root.
+		if ( elementPtr == nullptr )
+			return( QVariant( ) );
+
 		// Handle RSS Element-Type.
-		switch( elementPtr->mType )
+		switch( elementPtr->type )
 		{
 
 		// RSS Channel
@@ -445,14 +544,12 @@ namespace rss
 			qDebug( ) << "ChannelModel::data - invalid Element-Type !";
 #endif // DEBUG
 
-			// Stop
-			break;
+			// Return invalid QVariant.
+			return( QVariant( ) );
+
 
 		} /// default
 		} /// Handle RSS Element-Type.
-
-		// Return Default
-		return( QModelIndex( ) );
 
 	} /// ChannelModel::data
 
@@ -464,20 +561,73 @@ namespace rss
 	  * @param pCol - Col, not used, alway 0.
 	**/
 	QModelIndex ChannelModel::index( int pRow, int pCol, const QModelIndex & parentIndex ) const
-	{// TODO ChannelModel::index
+	{
+
+		// Return root, if Model-Index is invalid.
+		if ( pRow < 0 || pCol < 0 || !parentIndex.isValid( ) )
+			return( createIndex( 0, 0, nullptr ) );
 
 		// Thread-Lock
 		QMutexLocker uLock( &mChannelsMutex );
 
-		// Get Channel using index.
-		channel_ptr_t channel( getChannelByIndex( pCol ) );
+		// Return Channel.
+		if ( parentIndex.internalPointer( ) == nullptr )
+		{ // Root
+
+			// Channel.
+			rss::Channel *const channel( getChannelByIndex( pRow ) );
+
+			// Return Model-Index for a Channel.
+			return( createIndex( pRow, pCol, channel ) );
+
+		} /// Root
+		else // sub-Element
+		{
+
+			// Get Element.
+			rss::Element *const element( static_cast<rss::Element*>( parentIndex.internalPointer( ) ) );
+
+			// Handle Element-Type.
+			switch( element->type )
+			{
+
+			// Channel
+			case rss::ElementType::CHANNEL:
+			{
+
+				// Get Channel from Model-Index.
+				rss::Channel *const channel( static_cast<rss::Channel*>( parentIndex.internalPointer( ) ) );
+
+				// Get Item.
+				rss::Item *const item( static_cast<rss::Item*>( channel->getItem( pRow ) ) );
 
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-		// Check Channel pointer-value.
-		assert( channel != nullptr && "ChannelModel::index - Channel is null !" ); // Unreachable, because indeices range checked already.
-#endif // DEBUG
+				// Null-check.
+				assert( item != nullptr && "ChannelModel::index - Item is null ! Check rowsCount method logic." );
+#endif /// DEBUG
 
-		//
+				// Return Model-Index for a Item.
+				return( createIndex( 0, 0, item ) );
+
+			} /// Channel
+
+			// Channel Item
+			case rss::ElementType::ITEM:
+			{
+
+				// Do not provide any Model-Indices for Item sub-Elements.
+				return( QModelIndex( ) );
+
+
+			} /// Channel Item
+
+			// Default
+			default:
+				return( QModelIndex( ) ); // Return invalid-index.
+
+			}
+
+		} /// sub-Element.
 
 	} /// ChannelModel::index
 
@@ -490,7 +640,33 @@ namespace rss
 	  * @throws - no excepions.
 	**/
 	QModelIndex ChannelModel::parent( const QModelIndex & pIndex ) const
-	{// TODO ChannelModel::parent
+	{
+
+		// Cancel, if root || invalid.
+		if ( !pIndex.isValid( ) || pIndex.internalPointer( ) == nullptr )
+			return( QModelIndex( ) );
+
+		// Get Element.
+		rss::Element *const element( static_cast<rss::Element*>( pIndex.internalPointer( ) ) );
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Null-check.
+		assert( element != nullptr && "ChannelModel::parent - Element is null ! Check ChannelModel::index() method." );
+#endif // DEBUG
+
+		// Channel has no parent Model-Index.
+		if ( element->type == ElementType::CHANNEL )
+			return( QModelIndex( ) );
+
+		// Cancel, if not Channel Item-Element.
+		if ( element->type != ElementType::ITEM )
+			return( QModelIndex( ) );
+
+		// Get Item's Channel.
+		rss::Channel *const channel( static_cast<rss::Channel*>( element->parent ) );
+
+		// Generate Model-Index for Channel.
+		return( createIndex( 1, 0, channel ) );
 
 	} /// ChannelModel::parent
 
@@ -503,7 +679,26 @@ namespace rss
 	  * @throws - no exceptions.
 	**/
 	int ChannelModel::rowCount( const QModelIndex & parentIndex ) const
-	{// TODO ChannelModel::rowCount
+	{
+
+		// Invalid Model-Index.
+		if ( !parentIndex.isValid( ) )
+			return( -1 );
+
+		// root Model-Index.
+		if ( parentIndex.row( ) == 0 && parentIndex.internalPointer( ) == nullptr )
+			return( mChannels.size( ) );
+
+		// Get Element.
+		rss::Element *const element( static_cast<rss::Element*>( parentIndex.internalPointer( ) ) );
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Check Element.
+		assert( element != nullptr && "ChannelModel::rowCount - Element is null ! None root-Index must have Element !" );
+#endif // DEBUG
+
+		// Return Element size.
+		return( element->count( ) );
 
 	} /// ChannelModel::rowCount
 
@@ -516,7 +711,26 @@ namespace rss
 	  * @throws - no exceptions.
 	**/
 	bool ChannelModel::hasChildren( const QModelIndex & pIndex ) const
-	{// TODO ChannelModel::hasChildren
+	{
+
+		// Invalid Model-Index == root.
+		if ( !pIndex.isValid( ) || pIndex.internalPointer( ) == nullptr )
+			return( mChannels.size( ) );
+
+		// Element.
+		rss::Element *const element( static_cast<rss::Element*>( pIndex.internalPointer( ) ) );
+
+		// Channel
+		if ( element->type == rss::ElementType::CHANNEL )
+		{
+
+			// Return Channel Items-Count.
+			return( element->count( ) );
+
+		} /// Channel
+
+		// Items & their sub-Element no counted.
+		return( 0 );
 
 	} /// ChannelModel::hasChildren
 
@@ -530,10 +744,13 @@ namespace rss
 	  * @return - QVariant with View's data.
 	  * @throws - no exceptions.
 	**/
-	QVariant ChannelModel::headerData( int pSection, Qt::Orientation pOrientation, int pRole ) const
-	{// TODO ChannelModel::headerData
+	//QVariant ChannelModel::headerData( int pSection, Qt::Orientation pOrientation, int pRole ) const
+	//{
 
-	} /// ChannelModel::headerData
+		// Return RSS
+		//return( QVariant( QString( "RSS" ) ) );
+
+	//} /// ChannelModel::headerData
 
 	// -----------------------------------------------------------
 

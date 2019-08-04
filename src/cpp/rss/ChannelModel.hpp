@@ -111,16 +111,15 @@ namespace rss
 
 	/**
 	  * ChannelModel - tree-model for RSS Channels.
+	  * <br/>
 	  *
-	  * @brief
-	  * Structure:
-	  *  - Channel:
-	  *    - Image (Logo, Icon);
-	  *    - Name (Title);
-	  *    - Url;
-	  *    - Items (News):
-	  *      -
+	  * @brief<br/>
+	  * Columns not used, so that param is alway 0.
+	  * Row #0 used to get Model-Index for root, means
+	  * its rows count = Channels count.
+	  * <br/>
 	  *
+	  * <br/>
 	  * @version 0.1
 	  * @since 21.07.2019
 	  * @authors Denis Z. (code4un@yandex.ru)
@@ -175,100 +174,156 @@ namespace rss
 		enum Roles
 		{
 
-			/** Image Role. Used to check if Image Element exists. **/
-			CHANNEL_IMAGE_ROLE = Qt::DecorationRole,
+			// TEST-CODE
+			/**
+			  * By default, Channel & Item returns Title as
+			  * DisplayRole. Use RSS_ELEMENT_DESCRIPTION_ROLE
+			  * to retrieve the Description.
+			**/
+			RSS_TITLE_ELEMENT_ROLE = Qt::DisplayRole,
 
-			/** <title> **/
-			CHANNEL_TITLE_ROLE = Qt::DisplayRole,
+			/**
+			  * <image><url /></image>
+			  * Used to return Url of an Image.
+			  * Use same value as DecorationRole.
+			  * If returned value is valid (QUrl), try using
+			  * RSS_IMAGE_WIDTH, RSS_IMAGE_HEIGHT, RSS_IMAGE_TITLE,
+			  * RSS_IMAGE_LINK, RSS_IMAGE_DESCRIPTION to retrieve
+			  * optional (additional) data.
+			  * If Image-Element not found,
+			  * invalid QVariant returned.
+			**/
+			RSS_IMAGE_ELEMENT_ROLE = Qt::DecorationRole,
 
-			/** <name> **/
-			CHANNEL_NAME_ROLE = Qt::DisplayRole,
+			/** <image><title /></image>. @see RSS_IMAGE_ELEMENT_ROLE.
+			 * If <width> not found, invalid QVariant returned. **/
+			RSS_IMAGE_TITLE_ELEMENT_ROLE = Qt::UserRole + 1,
 
-			/** <url> **/
-			CHANNEL_URL_ROLE = Qt::UserRole + 1,
+			/** <image><description /></image>. @see RSS_IMAGE_ELEMENT_ROLE.
+			 * If <height> not found, invalid QVariant returned. **/
+			RSS_IMAGE_DESCRIPTION_ELEMENT_ROLE = Qt::UserRole + 2,
 
-			/** <link> **/
-			CHANNEL_LINK_ROLE = CHANNEL_URL_ROLE,
-			ITEM_LINK_ROLE = CHANNEL_LINK_ROLE,
-			LINK_ROLE = ITEM_LINK_ROLE,
+			/** <image><width /></image>. @see RSS_IMAGE_ELEMENT_ROLE.
+			 * If <width> not found, invalid QVariant returned. **/
+			RSS_IMAGE_WIDTH_ELEMENT_ROLE = Qt::UserRole + 3,
 
-			/** <description> **/
-			CHANNEL_DESCRIPTION_ROLE = Qt::UserRole + 2,
-			DESCRIPTION_ROLE = CHANNEL_DESCRIPTION_ROLE,
-			ITEM_DESCRIPTION_ROLE = DESCRIPTION_ROLE,
+			/** <image><height /></image>. @see RSS_IMAGE_ELEMENT_ROLE.
+			 * If <width> not found, invalid QVariant returned. **/
+			RSS_IMAGE_HEIGHT_ELEMENT_ROLE = Qt::UserRole + 4,
 
-			/** <text> **/
-			CHANNEL_TEXT_ROLE = DESCRIPTION_ROLE,
+			/** <image><link /></image>. @see RSS_IMAGE_ELEMENT_ROLE.
+			 * If <width> not found, invalid QVariant returned. **/
+			RSS_IMAGE_LINK_ELEMENT_ROLE = Qt::UserRole + 5,
 
-			/** <language> **/
-			CHANNEL_LANGUAGE_ROLE = Qt::UserRole + 3,
+			/**
+			  * Language.
+			  * <language>ru-RU</language>
+			  * Returns language-id.
+			  * If not found, invalid QVariant returned.
+			**/
+			RSS_LANGUAGE_ELEMENT_ROLE = Qt::UserRole + 6,
 
-			/** <copyright> **/
-			CHANNEL_COPYRIGHT_ROLE = Qt::UserRole + 4,
+			/** <copyright>. If Element not found, returns invalid QVariant. **/
+			RSS_COPYRIGHT_ELEMENT_ROLE = Qt::UserRole + 7,
 
-			/** <managingEditor> **/
-			CHANNEL_EDITOR_ROLE = Qt::UserRole + 5,
+			/** <managingEditor>. If Element not found, returns invalid QVariant. **/
+			RSS_MANAGING_EDITOR_ELEMENT_ROLE = Qt::UserRole + 8,
 
-			/** <webMaster> **/
-			CHANNEL_WEB_MASTER_ROLE = Qt::UserRole + 6,
+			/** <webMaster>. If Element not found, returns invalid QVariant. **/
+			RSS_WEB_MASTER_ELEMENT_ROLE = Qt::UserRole + 9,
 
-			/** <pubDate> **/
-			CHANNEL_PUB_DATE_ROLE = Qt::UserRole + 7,
+			/** <pubDate>. If Element not found, returns invalid QVariant. **/
+			RSS_PUB_DATE_ELEMENT_ROLE = Qt::UserRole + 10,
 
-			/** <lastBuildDate> **/
-			CHANNEL_LAST_BUILD_DATE_ROLE = Qt::UserRole + 8,
+			/** <lastBuildDate>. If Element not found, returns invalid QVariant. **/
+			RSS_LAST_BUILD_DATE_ELEMENT_ROLE = Qt::UserRole + 11,
 
-			/** <category> **/
-			CHANNEL_CATEGORY_ROLE = Qt::UserRole + 9,
+			/** <category>TEXT</category>. If Element not found, returns invalid QVariant. **/
+			RSS_CATEGORY_ELEMENT_TEXT_ROLE = Qt::UserRole + 12,
 
-			/** <generator> **/
-			CHANNEL_GENERATOR_ROLE = Qt::UserRole + 10,
+			/** <category domain="URL">. If Element not found, returns invalid QVariant. **/
+			RSS_CATEGORY_ELEMENT_DOMAIN_ROLE = Qt::UserRole + 13,
 
-			/** <docs> **/
-			CHANNEL_DOCS_ROLE = Qt::UserRole + 11,
+			/** <generator>. If Element not found, returns invalid QVariant. **/
+			RSS_GENERATOR_ELEMENT_ROLE = Qt::UserRole + 14,
 
-			/** <cloud> **/
-			CHANNEL_CLOUD_ROLE = Qt::UserRole + 12,
+			/** <docs>. If Element not found, returns invalid QVariant. **/
+			RSS_DOCS_ELEMENT_ROLE = Qt::UserRole + 15,
 
-			/** <ttl> **/
-			CHANNEL_TTL_ROLE = Qt::UserRole + 13,
+			/** <cloud domain="URL">. If Element not found, returns invalid QVariant. **/
+			RSS_CLOUD_ELEMENT_DOMAIN_ROLE = Qt::UserRole + 16,
 
-			/** <textInput> **/
-			CHANNEL_TEXT_INPUT_ROLE = Qt::UserRole + 14,
+			/** <cloud port="80">. If Element not found, returns invalid QVariant. **/
+			RSS_CLOUD_ELEMENT_PORT_ROLE = Qt::UserRole + 17,
 
-			/** <skipHours> **/
-			CHANNEL_SKIP_HOURS_ROLE = Qt::UserRole + 15,
+			/** <cloud path="/RPC">. If Element not found, returns invalid QVariant. **/
+			RSS_CLOUD_ELEMENT_PATH_ROLE = Qt::UserRole + 18,
 
-			/** <skipDays> **/
-			CHANNEL_SKIP_DAYS_ROLE = Qt::UserRole + 16,
+			/** <cloud registerProcedure="xmlStorageSystem.rssPleaseNotify">. If Element not found, returns invalid QVariant. **/
+			RSS_CLOUD_ELEMENT_REGISTER_PROCEDURE_ROLE = Qt::UserRole + 19,
 
-			/** <image><url></image> **/
-			CHANNEL_IMAGE_URL_ROLE = Qt::UserRole + 17,
+			/** <cloud protocol="xml-rpc">. If Element not found, returns invalid QVariant. **/
+			RSS_CLOUD_ELEMENT_PROTOCOL_ROLE = Qt::UserRole + 20,
 
-			/** <image><title></image> **/
-			IMAGE_TITLE_ROLE = Qt::UserRole + 18,
+			/** <ttl>int</ttl>. If Element not found, returns invalid QVariant. **/
+			RSS_TTL_ELEMENT_ROLE = Qt::UserRole + 21,
 
-			/** <image><link></image> **/
-			IMAGE_LINK_ROLE = Qt::UserRole + 19,
+			/** <textInput><title></textInput>. If Element not found, returns invalid QVariant. **/
+			RSS_TEXT_INPUT_ELEMENT_TITLE_ROLE = Qt::UserRole + 22,
 
-			/** <image><width></image> **/
-			IMAGE_WIDTH_ROLE = Qt::UserRole + 20,
+			/** <textInput><description></textInput>. If Element not found, returns invalid QVariant. **/
+			RSS_TEXT_INPUT_ELEMENT_DESCRIPTION_ROLE = Qt::UserRole + 23,
 
-			/** <image><height></image> **/
-			IMAGE_HEIGHT_ROLE = Qt::UserRole + 21,
+			/** <textInput><name></textInput>. If Element not found, returns invalid QVariant. **/
+			RSS_TEXT_INPUT_ELEMENT_NAME_ROLE = Qt::UserRole + 24,
 
-			/** <image><description></image> **/
-			IMAGE_DESCRIPTION_ROLE = Qt::UserRole + 22,
+			/** <textInput><link></textInput>. If Element not found, returns invalid QVariant. **/
+			RSS_TEXT_INPUT_ELEMENT_LINK_ROLE = Qt::UserRole + 25,
 
-			/** <image><url></image> **/
-			IMAGE_URL_ROLE = CHANNEL_IMAGE_URL_ROLE,
+			/** <skipHours>. If Element not found, returns invalid QVariant. **/
+			RSS_SKIP_HOURS_ELEMENT_ROLE = Qt::UserRole + 26,
 
-			/** Image check. **/
-			IMAGE_EXISTS_ROLE = CHANNEL_IMAGE_ROLE,
+			/** <skipDays>. If Element not found, returns invalid QVariant. **/
+			RSS_SKIP_DAYS_ELEMENT_ROLE = Qt::UserRole + 27,
 
-			/** <title> **/
-			ITEM_TITLE_ROLE = CHANNEL_TITLE_ROLE,
-			TITLE_ROLE = CHANNEL_TITLE_ROLE,
+			/** <description>. If Element not found, returns invalid QVariant. **/
+			RSS_DESCRIPTION_ELEMENT_ROLE = Qt::UserRole + 28,
+
+			/** <link>. If Element not found, returns invalid QVariant. **/
+			RSS_LINK_ELEMENT_ROLE = Qt::UserRole + 29,
+
+			/** <author>some_email@mail.org</author>. If Element not found, returns invalid QVariant. **/
+			RSS_AUTHOR_ELEMENT_ROLE = Qt::UserRole + 30,
+
+			/** <comments>. If Element not found, returns invalid QVariant. **/
+			RSS_COMMENTS_ELEMENT_ROLE = Qt::UserRole + 31,
+
+			/** <guid>. If Element not found, returns invalid QVariant. **/
+			RSS_GUID_ELEMENT_ROLE = Qt::UserRole + 32,
+
+			/** <source>TEXT</source>. If Element not found, returns invalid QVariant. **/
+			RSS_SOURCE_ELEMENT_TEXT_ROLE = Qt::UserRole + 33,
+
+			/** <source url="URL">. If Element not found, returns invalid QVariant. **/
+			RSS_SOURCE_ELEMENT_URL_ROLE = Qt::UserRole + 34,
+
+			/**
+			  * <enclosure url="URL">
+			  * If Element not found, returns invalid QVariant.
+			**/
+			RSS_ENCLOSURE_ELEMENT_URL_ROLE = Qt::UserRole + 35,
+
+			/**
+			  * <enclosure length="0">
+			  * If Element not found, returns invalid QVariant.
+			**/
+			RSS_ENCLOSURE_ELEMENT_LENGTH_ROLE = Qt::UserRole + 36,
+
+			/**
+			  * <enclosure type="mime/type">
+			  * If Element not found, returns invalid QVariant.
+			**/
+			RSS_ENCLOSURE_ELEMENT_TYPE_ROLE = Qt::UserRole + 37
 
 		}; // Roles
 
@@ -406,7 +461,7 @@ namespace rss
 		  * @return - QVariant with View's data.
 		  * @throws - no exceptions.
 		**/
-		virtual QVariant headerData( int pSection, Qt::Orientation pOrientation, int pRole = Qt::DisplayRole ) const override;
+		//virtual QVariant headerData( int pSection, Qt::Orientation pOrientation, int pRole = Qt::DisplayRole ) const override;
 
 		// -----------------------------------------------------------
 

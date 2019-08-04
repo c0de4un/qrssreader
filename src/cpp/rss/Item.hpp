@@ -78,9 +78,10 @@ namespace rss
 		/**
 		  * Item constructor.
 		  *
+		  * @param parentElement - Parent-Element.
 		  * @throws - no exceptions.
 		**/
-		explicit Item( ) noexcept;
+		explicit Item( Element *const parentElement ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR
@@ -131,6 +132,24 @@ namespace rss
 		  * @throws - no exceptions.
 		**/
 		void releaseElements( ) noexcept;
+
+		/**
+		  * Returns 'true' if this Element don't have sub-Elements.
+		  *
+		  * @threadsafe - not thread-safe.
+		  * @return - 'true' if Empty, 'false' if have sub-Elements.
+		  * @throws - no exceptions.
+		**/
+		virtual bool empty( ) const noexcept final;
+
+		/**
+		  * Count sub-Elements.
+		  *
+		  * @threadsafe - not thread-safe.
+		  * @return - number of sub-Elements.
+		  * @throws - no exceptions.
+		**/
+		virtual int count( ) const noexcept final;
 
 		// -----------------------------------------------------------
 

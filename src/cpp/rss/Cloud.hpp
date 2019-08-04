@@ -83,25 +83,27 @@ namespace rss
 		  * Cloud constructor.
 		  *
 		  * @param pDomain - Url to RSS-Cloud Web-Service (HTTP-POST, XML-RPC or SOAP 1.1).
+		  * @param parentElement - Parent-Element.
 		  * @param pPort - Port.
 		  * @param pPath - Path.
 		  * @param registerProcedure - Register Procedure Name.
 		  * @param pProtocol - Protocol (xml-rpc, soap, etc).
 		  * @throws - no exceptions.
 		**/
-		explicit Cloud( const QString & pDomain_, const int pPort_, const QString & pPath_, const QString registerProcedure_, const QString pProtocol_ ) noexcept;
+		explicit Cloud( const QString & pDomain_, Element *const parentElement, const int pPort_, const QString & pPath_, const QString registerProcedure_, const QString pProtocol_ ) noexcept;
 
 		/**
 		  * Cloud constructor.
 		  *
 		  * @param pDomain - Url to RSS-Cloud Web-Service (HTTP-POST, XML-RPC or SOAP 1.1).
+		  * @param parentElement - Parent-Element.
 		  * @param pPort - Port.
 		  * @param pPath - Path.
 		  * @param registerProcedure - Register Procedure Name.
 		  * @param pProtocol - Protocol (xml-rpc, soap, etc).
 		  * @throws - no exceptions.
 		**/
-		explicit Cloud( const QUrl & pDomain_, const int pPort_, const QString & pPath_, const QString registerProcedure_, const QString pProtocol_ ) noexcept;
+		explicit Cloud( const QUrl & pDomain_, Element *const parentElement, const int pPort_, const QString & pPath_, const QString registerProcedure_, const QString pProtocol_ ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR

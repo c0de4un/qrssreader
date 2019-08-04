@@ -53,11 +53,13 @@ namespace rss
       * Element constructor.
       *
       * @param pType - Element-Type.
+	  * @param parentElement - Parent-Element.
       * @throws - no exceptions.
     **/
-    Element::Element( const Element::Type pType ) noexcept
+	Element::Element( const Element::Type pType, Element *const parentElement ) noexcept
 		: id( mElementsIDStorage.generateID( ) ),
-		  mType( pType )
+		  type( pType ),
+		  parent( parentElement )
     {
     }
 
@@ -81,6 +83,26 @@ namespace rss
     // ===========================================================
     // METHODS
     // ===========================================================
+
+	/**
+	  * Returns 'true' if this Element don't have sub-Elements.
+	  *
+	  * @threadsafe - not thread-safe.
+	  * @return - 'true' if Empty, 'false' if have sub-Elements.
+	  * @throws - no exceptions.
+	**/
+	bool Element::empty( ) const noexcept
+	{ return( true ); }
+
+	/**
+	  * Count sub-Elements.
+	  *
+	  * @threadsafe - not thread-safe.
+	  * @return - number of sub-Elements.
+	  * @throws - no exceptions.
+	**/
+	int Element::count( ) const noexcept
+	{ return( 0 ); }
 
     /**
       * Wrapper-mehod to cast Element to specific type.

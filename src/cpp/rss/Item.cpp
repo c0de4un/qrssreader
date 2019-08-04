@@ -45,10 +45,11 @@ namespace rss
 	/**
 	  * Item constructor.
 	  *
+	  * @param parentElement - Parent-Element.
 	  * @throws - no exceptions.
 	**/
-	Item::Item( ) noexcept
-		: Element( ElementType::CHANNEL_ITEM )
+	Item::Item( Element *const parentElement ) noexcept
+		: Element( ElementType::CHANNEL_ITEM, parentElement )
 	{ }
 
 	// ===========================================================
@@ -110,7 +111,7 @@ namespace rss
 	{
 
 		// Search Element.
-		auto elementPos_ = elements.find( pElement->mType );
+		auto elementPos_ = elements.find( pElement->type );
 
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
 		// Element Position Assertion.
@@ -122,7 +123,7 @@ namespace rss
 #endif // DEBUG
 
 		// Add Element.
-		elements.insert( pElement->mType, pElement );
+		elements.insert( pElement->type, pElement );
 
 		// Return TRUE
 		return( true );
@@ -175,6 +176,26 @@ namespace rss
 		elements.clear( );
 
 	} /// Item::releaseElements
+
+	/**
+	  * Returns 'true' if this Element don't have sub-Elements.
+	  *
+	  * @threadsafe - not thread-safe.
+	  * @return - 'true' if Empty, 'false' if have sub-Elements.
+	  * @throws - no exceptions.
+	**/
+	bool Item::empty( ) const noexcept
+	{ return( elements.empty( ) ); }
+
+	/**
+	  * Count sub-Elements.
+	  *
+	  * @threadsafe - not thread-safe.
+	  * @return - number of sub-Elements.
+	  * @throws - no exceptions.
+	**/
+	int Item::count( ) const noexcept
+	{ return( elements.size( ) ); }
 
 	// -----------------------------------------------------------
 

@@ -163,6 +163,12 @@ namespace rss
 			/** RSS Channel Item. **/
 			ITEM = 26
 
+			/** WIDTH (<image><width /></image>) **/
+			//WIDTH = 27,
+
+			/** HEIGHT (<image><height /></image>) **/
+			//HEIGHT = 28
+
             // -----------------------------------------------------------
 
         }; // Element::Type
@@ -182,7 +188,10 @@ namespace rss
 		const element_id_t id;
 
         /** Type. **/
-        const Element::Type mType;
+		const Element::Type type;
+
+		/** Parent-Element. **/
+		Element *const parent;
 
         // ===========================================================
         // CONSTRUCTOR
@@ -192,9 +201,10 @@ namespace rss
           * Element constructor.
           *
           * @param pType - Element-Type.
+		  * @param parentElement - Parent-Element.
           * @throws - no exceptions.
         **/
-        explicit Element( const Element::Type pType ) noexcept;
+		explicit Element( const Element::Type pType, Element *const parentElement ) noexcept;
 
         // ===========================================================
         // DESTRUCTOR
@@ -210,6 +220,24 @@ namespace rss
         // ===========================================================
         // METHODS
         // ===========================================================
+
+		/**
+		  * Returns 'true' if this Element don't have sub-Elements.
+		  *
+		  * @threadsafe - not thread-safe.
+		  * @return - 'true' if Empty, 'false' if have sub-Elements.
+		  * @throws - no exceptions.
+		**/
+		virtual bool empty( ) const noexcept;
+
+		/**
+		  * Count sub-Elements.
+		  *
+		  * @threadsafe - not thread-safe.
+		  * @return - number of sub-Elements.
+		  * @throws - no exceptions.
+		**/
+		virtual int count( ) const noexcept;
 
         /**
           * Wrapper-mehod to cast Element to specific type.

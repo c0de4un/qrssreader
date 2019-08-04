@@ -46,11 +46,12 @@ namespace rss
 	  * Link constructor.
 	  *
 	  * @param pUrl - QString with Url.
+	  * @param parentElement - Parent-Element.
 	  * @param pType - Element-Type, default is Link.
 	  * @throws - no exceptions.
 	**/
-	Link::Link( const QString & pUrl, const Element::Type pType ) noexcept
-		: Element( pType ),
+	Link::Link( const QString & pUrl, Element *const parentElement, const Element::Type pType ) noexcept
+		: Element( pType, parentElement ),
 		  mUrl( pUrl )
 	{
 	}

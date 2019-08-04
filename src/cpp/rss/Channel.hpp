@@ -189,6 +189,16 @@ namespace rss
 		element_ptr_t getElement( const ElementType pType ) noexcept;
 
 		/**
+		  * Searches for a Item.
+		  *
+		  * @threadsafe - thread-lock used.
+		  * @param pIndex - Item index.
+		  * @returns - Item, or null.
+		  * @throws - no exceptions.
+		**/
+		item_ptr_t getItem( const int pIndex ) const noexcept;
+
+		/**
 		  * Returns 'true' if RSS Channel's Item with the given GUID found.
 		  *
 		  * @threadsafe - thread-lock used.
@@ -196,7 +206,7 @@ namespace rss
 		  * @return - 'true' if Item found, 'false' if not.
 		  * @throws - no exceptions.
 		**/
-		bool hasItem( const QString & pGUID ) noexcept;
+		bool hasItemGUID( const QString & pGUID ) noexcept;
 
 		/**
 		  * Sets (add, insert) Element.
@@ -250,6 +260,24 @@ namespace rss
 		// ===========================================================
 		// METHODS
 		// ===========================================================
+
+		/**
+		  * Returns 'true' if this Element don't have sub-Elements.
+		  *
+		  * @threadsafe - not thread-safe.
+		  * @return - 'true' if Empty, 'false' if have sub-Elements.
+		  * @throws - no exceptions.
+		**/
+		virtual bool empty( ) const noexcept final;
+
+		/**
+		  * Count sub-Elements.
+		  *
+		  * @threadsafe - not thread-safe.
+		  * @return - number of sub-Elements.
+		  * @throws - no exceptions.
+		**/
+		virtual int count( ) const noexcept final;
 
 		/**
 		  * Adds Item to Channel.

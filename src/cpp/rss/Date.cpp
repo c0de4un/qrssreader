@@ -46,11 +46,12 @@ namespace rss
 	  * Date constructor.
 	  *
 	  * @param pDate - QString with Date.
+	  * @param parentElement - Parent-Element.
 	  * @param pType - Element-Type, default is PubDate.
 	  * @throws - no exceptions.
 	**/
-	Date::Date( const QString & pDate, const Element::Type pType ) noexcept
-		: Element ( pType ),
+	Date::Date( const QString & pDate, Element *const parentElement, const Element::Type pType ) noexcept
+		: Element ( pType, parentElement ),
 		  mStringDate( pDate )
 	{
 	}

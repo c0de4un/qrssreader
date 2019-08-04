@@ -42,11 +42,6 @@
 #include <QUrl>
 #endif // !QURL_H
 
-// Include QMap
-#ifndef QMAP_H
-#include <QMap>
-#endif // !QMAP_H
-
 // ===========================================================
 // Image
 // ===========================================================
@@ -70,11 +65,26 @@ namespace rss
 		// -----------------------------------------------------------
 
 		// ===========================================================
-		// CONFIG
+		// CONSTANTS
 		// ===========================================================
 
-		/** Alias for Element pointer. **/
-		using element_ptr_t = Element*;
+		/** Url. **/
+		const QUrl *const url;
+
+		/** Link. **/
+		const QUrl *const link;
+
+		/** Title. **/
+		const QString *const title;
+
+		/** Description. **/
+		const QString *const description;
+
+		/** Width. **/
+		const int width;
+
+		/** Height. **/
+		const int height;
 
 		// ===========================================================
 		// CONSTRUCTOR
@@ -83,9 +93,18 @@ namespace rss
 		/**
 		  * Image constructor.
 		  *
+		  * @param parentElement - Parent-Element.
+		  * @param pUrl - URL
+		  * @param pLink - Link-Url, null if not used.
+		  * @param pTitle - Title, null if not used.
+		  * @param pDescription - Description, null if not used.
+		  * @param pWidth - Width, -1 if not used.
+		  * @param pHeight - Height, -1 if not used.
 		  * @throws - no exceptions.
 		**/
-		explicit Image( ) noexcept;
+		explicit Image( Element *const parentElement, const QUrl *const pUrl,
+						const QUrl *const pLink, const QString *const pTitle,
+						const QString *const pDescription, const int pWidth, const int pHeight ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR
@@ -98,42 +117,11 @@ namespace rss
 		**/
 		virtual ~Image( ) noexcept final;
 
-		// ===========================================================
-		// GETTERS & SETTERS
-		// ===========================================================
-
-		/**
-		  * Searches for a Element matching the given Element-Type.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @param elementType - Element-Type.
-		  * @return - Element, or null.
-		  * @throws - no exceptions.
-		**/
-		element_ptr_t getElement( const ElementType elementType ) const noexcept;
-
-		/**
-		  * Sets (add, insert) Element.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @param pElement - Element.
-		  * @returns - 'true' if Element set, 'false' if not (other Element of the same type set, or invalid Element-Type).
-		  * @throws - no exceptions.
-		**/
-		bool setElement( element_ptr_t pElement ) noexcept;
-
 		// -----------------------------------------------------------
 
 	private:
 
 		// -----------------------------------------------------------
-
-		// ===========================================================
-		// FIELDS
-		// ===========================================================
-
-		/** Elements. **/
-		QMap<ElementType, element_ptr_t> elements;
 
 		// ===========================================================
 		// DELETED CONSTRUCTORS & OPERATORS
@@ -150,18 +138,6 @@ namespace rss
 
 		/** @deleted Image move assignment operator. **/
 		Image & operator=( Image && ) noexcept = delete;
-
-		// ===========================================================
-		// METHODS
-		// ===========================================================
-
-		/**
-		  * Deletes Elements.
-		  *
-		  * @threadsafe - not thread-safe.
-		  * @throws - no exceptions.
-		**/
-		void releaseElements( ) noexcept;
 
 		// -----------------------------------------------------------
 

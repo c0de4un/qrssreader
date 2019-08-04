@@ -85,10 +85,11 @@ namespace rss
 		  *
 		  * @param pUrl - Url.
 		  * @param pText - Text.
+		  * @param parentElement - Parent-Element.
 		  * @param elementType - Element-Type.
 		  * @throws - no exceptions.
 		**/
-		explicit Source( const QString & pUrl, const QString & pText, const ElementType elementType = ElementType::SOURCE ) noexcept;
+		explicit Source( const QString & pUrl, const QString & pText, Element *const parentElement, const ElementType elementType = ElementType::SOURCE ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR

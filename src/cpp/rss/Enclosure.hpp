@@ -97,7 +97,7 @@ namespace rss
 		const qlonglong length;
 
 		/** MIME-Type. **/
-		const QMimeType type;
+		const QMimeType mimeType;
 
 		// ===========================================================
 		// CONSTRUCTOR
@@ -107,11 +107,12 @@ namespace rss
 		  * Enclosure constructor.
 		  *
 		  * @param pUrl - Url to a data.
+		  * @param parentElement - Parent-Element.
 		  * @param pLength - data length in bytes.
 		  * @param mimeType - MIME-Type.
 		  * @throws - no exceptions.
 		**/
-		explicit Enclosure( const QString & pUrl, const QString & pLength, const QString & mimeType ) noexcept;
+		explicit Enclosure( const QString & pUrl, Element *const parentElement, const QString & pLength, const QString & mimeType ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR

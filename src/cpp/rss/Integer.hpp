@@ -72,19 +72,21 @@ namespace rss
 		  * Integer constructor.
 		  *
 		  * @param strValue - QString with int-value. Value not modified.
+		  * @param parentElement - Parent-Element.
 		  * @param pType - Element-Type (ttl, skipHours, skipDays).
 		  * @throws - no exceptions.
 		**/
-		explicit Integer( const QString & strValue, const Element::Type pType = Element::Type::TTL ) noexcept;
+		explicit Integer( const QString & strValue, Element *const parentElement, const Element::Type pType = Element::Type::TTL ) noexcept;
 
 		/**
 		  * Integer constructor.
 		  *
 		  * @param pValue - int-value, value copied.
+		  * parentElement
 		  * @param pType - Element-Type (ttl, skipHours, skipDays).
 		  * @throws - no exceptions.
 		**/
-		explicit Integer( const int pValue, const Element::Type pType = Element::Type::TTL ) noexcept;
+		explicit Integer( const int pValue, Element *const parentElement, const Element::Type pType = Element::Type::TTL ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR
