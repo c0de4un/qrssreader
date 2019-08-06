@@ -186,6 +186,8 @@ namespace rss
 
 } // rss
 
+#define QRSS_READER_ITEM_DECL
+
 // -----------------------------------------------------------
 
 #endif // !QRSS_READER_ITEM_HPP

@@ -29,6 +29,11 @@
 #include "ChannelModel.hpp"
 #endif // !Q_RSS_READER_CHANNEL_MODEL_HPP
 
+// Include rss::SAXRSSHandler
+#ifndef QRSS_READER_SAX_RSS_HANDLER_HPP
+#include "../utils/SAXRSSHandler.hpp"
+#endif // !QRSS_READER_SAX_RSS_HANDLER_HPP
+
 #if defined( QT_DEFINED ) || defined( DEBUG ) // DEBUG
 
 // Include QDebug
@@ -476,6 +481,46 @@ namespace rss
 
 	}
 
+	/**
+	  * Reads RSS-file.
+	  *
+	  * (?) If RSS-Channel with the same link found,
+	  * and it's newer (pubDate, lastBuildDate), their data merged.
+	  *
+	  * @threadsafe - not thread-safe.
+	  * @param pSrc - File-Path.
+	  * @param pChannel - Channel-class to update from rss-document.
+	  * @throws - no exceptions.
+	**/
+	void ChannelModel::readFile( const QString & pSrc, rss::Channel *const pChannel ) noexcept
+	{
+
+		// Create SAXRSSHandler instance.
+		rss::SAXRSSHandler rssHandler( pChannel );
+
+		// Create QFile.
+		QFile rssFile( pSrc );
+
+		assert( rssFile.exists( ) && "ChannelModel::readFile - file not found !" );
+
+		// Create Xml-InputSource
+		QXmlInputSource inputSource( &rssFile );
+
+		// Create default Xml-Reader.
+		QXmlSimpleReader xmlReader;
+
+		// Set SAX-Handler for Xml-Reader.
+		xmlReader.setContentHandler( &rssHandler );
+
+		// Parse SAX Xml RSS-Document.
+		xmlReader.parse( &inputSource );
+
+		// Add Channel
+		if ( pChannel == nullptr )
+			mChannels.push_back( rssHandler.getChannel( ) );
+
+	} /// ChannelModel::readFile
+
 	// ===========================================================
 	// OVERRIDE
 	// ===========================================================
@@ -733,6 +778,141 @@ namespace rss
 		return( 0 );
 
 	} /// ChannelModel::hasChildren
+
+	/**
+	  * Returns Role-Names used by this Model.
+	  *
+	  * @threadsafe - not required.
+	  * @return - QHash for QML.
+	  * @throws - no exceptions.
+	**/
+	QHash<int, QByteArray> ChannelModel::roleNames( ) const
+	{
+
+		// Create HashMap
+		QHash<int, QByteArray> rolesMap;
+
+		// Title
+		rolesMap[rss::ChannelModel::Roles::RSS_TITLE_ELEMENT_ROLE] = "title";
+
+		// Image Url.
+		rolesMap[rss::ChannelModel::Roles::RSS_IMAGE_ELEMENT_ROLE] = "image";
+
+		// Image Title.
+		rolesMap[rss::ChannelModel::Roles::RSS_IMAGE_TITLE_ELEMENT_ROLE] = "image_title";
+
+		// Image Link
+		rolesMap[rss::ChannelModel::Roles::RSS_IMAGE_LINK_ELEMENT_ROLE] = "image_link";
+
+		// Image Description
+		rolesMap[rss::ChannelModel::Roles::RSS_IMAGE_DESCRIPTION_ELEMENT_ROLE] = "image_description";
+
+		// Image Width
+		rolesMap[rss::ChannelModel::Roles::RSS_IMAGE_WIDTH_ELEMENT_ROLE] = "image_width";
+
+		// Image Height
+		rolesMap[rss::ChannelModel::Roles::RSS_IMAGE_HEIGHT_ELEMENT_ROLE] = "image_height";
+
+		// Language.
+		rolesMap[rss::ChannelModel::Roles::RSS_LANGUAGE_ELEMENT_ROLE] = "language";
+
+		// Copyright.
+		rolesMap[rss::ChannelModel::Roles::RSS_COPYRIGHT_ELEMENT_ROLE] = "copyright";
+
+		// Managing Editor.
+		rolesMap[rss::ChannelModel::Roles::RSS_MANAGING_EDITOR_ELEMENT_ROLE] = "managingEditor";
+
+		// Web-Master.
+		rolesMap[rss::ChannelModel::Roles::RSS_WEB_MASTER_ELEMENT_ROLE] = "webMaster";
+
+		// PubDate.
+		rolesMap[rss::ChannelModel::Roles::RSS_PUB_DATE_ELEMENT_ROLE] = "pubDate";
+
+		// Last Build Date.
+		rolesMap[rss::ChannelModel::Roles::RSS_LAST_BUILD_DATE_ELEMENT_ROLE] = "lastBuildDate";
+
+		// Category Text.
+		rolesMap[rss::ChannelModel::Roles::RSS_CATEGORY_ELEMENT_TEXT_ROLE] = "category_text";
+
+		// Category Domain.
+		rolesMap[rss::ChannelModel::Roles::RSS_CATEGORY_ELEMENT_DOMAIN_ROLE] = "category_domain";
+
+		// Generator.
+		rolesMap[rss::ChannelModel::Roles::RSS_GENERATOR_ELEMENT_ROLE] = "generator";
+
+		// Docs.
+		rolesMap[rss::ChannelModel::Roles::RSS_DOCS_ELEMENT_ROLE] = "docs";
+
+		// Cloud Domain.
+		rolesMap[rss::ChannelModel::Roles::RSS_CLOUD_ELEMENT_DOMAIN_ROLE] = "cloud_domain";
+
+		// Cloud Port.
+		rolesMap[rss::ChannelModel::Roles::RSS_CLOUD_ELEMENT_PORT_ROLE] = "cloud_port";
+
+		// Cloud Path.
+		rolesMap[rss::ChannelModel::Roles::RSS_CLOUD_ELEMENT_PATH_ROLE] = "cloud_path";
+
+		// Cloud Register-Procedure.
+		rolesMap[rss::ChannelModel::Roles::RSS_CLOUD_ELEMENT_REGISTER_PROCEDURE_ROLE] = "cloud_registerProcedure";
+
+		// Cloud Protocol.
+		rolesMap[rss::ChannelModel::Roles::RSS_CLOUD_ELEMENT_PROTOCOL_ROLE] = "cloud_protocol";
+
+		// TTL
+		rolesMap[rss::ChannelModel::Roles::RSS_TTL_ELEMENT_ROLE] = "ttl";
+
+		// Text-Input Title.
+		rolesMap[rss::ChannelModel::Roles::RSS_TEXT_INPUT_ELEMENT_TITLE_ROLE] = "textInput_title";
+
+		// Text-Input Description.
+		rolesMap[rss::ChannelModel::Roles::RSS_TEXT_INPUT_ELEMENT_DESCRIPTION_ROLE] = "textInput_description";
+
+		// Text-Input Name
+		rolesMap[rss::ChannelModel::Roles::RSS_TEXT_INPUT_ELEMENT_NAME_ROLE] = "textInput_name";
+
+		// Text-Input Link
+		rolesMap[rss::ChannelModel::Roles::RSS_TEXT_INPUT_ELEMENT_LINK_ROLE] = "textInput_link";
+
+		// Skip-Hours
+		rolesMap[rss::ChannelModel::Roles::RSS_SKIP_HOURS_ELEMENT_ROLE] = "skipHours";
+
+		// Skip-Days.
+		rolesMap[rss::ChannelModel::Roles::RSS_SKIP_DAYS_ELEMENT_ROLE] = "skipDays";
+
+		// Description.
+		rolesMap[rss::ChannelModel::Roles::RSS_DESCRIPTION_ELEMENT_ROLE] = "description";
+
+		// Link.
+		rolesMap[rss::ChannelModel::Roles::RSS_LINK_ELEMENT_ROLE] = "link";
+
+		// Author.
+		rolesMap[rss::ChannelModel::Roles::RSS_AUTHOR_ELEMENT_ROLE] = "author";
+
+		// Comments.
+		rolesMap[rss::ChannelModel::Roles::RSS_COMMENTS_ELEMENT_ROLE] = "comments";
+
+		// GUID.
+		rolesMap[rss::ChannelModel::Roles::RSS_GUID_ELEMENT_ROLE] = "guid";
+
+		// Source Text.
+		rolesMap[rss::ChannelModel::Roles::RSS_SOURCE_ELEMENT_TEXT_ROLE] = "source_text";
+
+		// Source Url.
+		rolesMap[rss::ChannelModel::Roles::RSS_SOURCE_ELEMENT_URL_ROLE] = "source_url";
+
+		// Enclosure Url.
+		rolesMap[rss::ChannelModel::Roles::RSS_ENCLOSURE_ELEMENT_URL_ROLE] = "enclosure_url";
+
+		// Enclosure Length.
+		rolesMap[rss::ChannelModel::Roles::RSS_ENCLOSURE_ELEMENT_LENGTH_ROLE] = "enclosure_length";
+
+		// Enclosure Mime-Type.
+		rolesMap[rss::ChannelModel::Roles::RSS_ENCLOSURE_ELEMENT_TYPE_ROLE] = "enclosure_type";
+
+		// Return Model-Roles.
+		return( rolesMap );
+
+	} /// ChannelModel::roleNames
 
 	/**
 	  * Returns data to display as View-Header.

@@ -125,6 +125,9 @@ namespace rss
 	/** Url **/
 	using Url = Link;
 
+	/** Comments. **/
+	using Comments = Link;
+
 } // rss
 
 // -----------------------------------------------------------

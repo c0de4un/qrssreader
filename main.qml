@@ -1,8 +1,11 @@
 import QtQuick 2.13
-import QtQuick.Window 2.13
-import QtQuick.Controls 2.5
-import QtQuick.Dialogs 1.2
+import QtQuick.Window 2.13 // ApplicationWindow
+import QtQuick.Controls 2.5 // Views
+import QtQuick.Dialogs 1.2 // Dialog
+import QtQml.Models 2.12 // DelegateModel
+
 import MainWindowLogic 1.0
+import ChannelModel 1.0
 
 // Main Window
 ApplicationWindow {
@@ -39,6 +42,49 @@ ApplicationWindow {
         if ( !urlInputDialog.visible )
             urlInputDialog.show( );
     }
+
+    // ------------------------------------------------------------------------
+
+    // Left-Panel
+    Column {
+
+        // ID
+        id: leftPaneLCol_id
+        // Width
+        width: 240
+        // Height
+        height: mainWindow_id.height
+        // Visibility
+        visible: true
+
+        // Channels ListView
+        ListView {
+            // ID
+            id: channelsListView_id
+            // Anchors
+            anchors.fill: parent
+            // Model
+            model: rssModel
+            // Delegate
+            delegate: Rectangle {
+
+                // Width
+                width: parent.width
+                // Height
+                height: 80
+                // Text
+                Text {
+                    text: rssModel.data( index, title )
+                }
+                /// Text
+
+            } // Delegate
+        }
+
+        /// Channels ListView
+
+    }
+    /// Left-Panel
 
     // ------------------------------------------------------------------------
 

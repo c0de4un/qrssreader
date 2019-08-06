@@ -77,7 +77,7 @@ namespace rss
 	  * @since 21.07.2019
 	  * @authors Denis Z. (code4un@yandex.ru)
 	**/
-	class Channel final : public Element
+	struct Channel final : public Element
 	{
 
 	public:
@@ -93,6 +93,13 @@ namespace rss
 
 		/** Alias for Element pointer. **/
 		using element_ptr_t = Element*;
+
+		// ===========================================================
+		// CONSTANTS
+		// ===========================================================
+
+		/** RSS Version. **/
+		const QString mRSSVersion;
 
 		// -----------------------------------------------------------
 
@@ -159,9 +166,10 @@ namespace rss
 		/**
 		  * Channel constructor.
 		  *
+		  * @param rssVersion - RSS-Version.
 		  * @throws - no exceptions.
 		**/
-		explicit Channel( ) noexcept;
+		explicit Channel( const QString & rssVersion = "2.0" ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR
@@ -319,6 +327,8 @@ namespace rss
 	// -----------------------------------------------------------
 
 } // rss
+
+#define QRSS_READER_CHANNEL_DECL
 
 // -----------------------------------------------------------
 

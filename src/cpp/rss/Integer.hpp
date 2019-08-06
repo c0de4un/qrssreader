@@ -144,6 +144,8 @@ namespace rss
 
 } // rss
 
+#define QRSS_READER_INTEGER_DECL
+
 // -----------------------------------------------------------
 
 #endif // !QRSS_READER_INTEGER_HPP

@@ -169,6 +169,8 @@ namespace rss
 
 } // rss
 
+#define QRSS_READER_ENCLOSURE_DECL
+
 // -----------------------------------------------------------
 
 #endif // !QRSS_READER_ENCLOSURE_HPP

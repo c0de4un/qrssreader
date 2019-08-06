@@ -147,6 +147,8 @@ namespace rss
 
 } // rss
 
+#define QRSS_READER_TEXT_DECL
+
 // -----------------------------------------------------------
 
 

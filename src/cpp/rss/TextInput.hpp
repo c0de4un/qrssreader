@@ -18,8 +18,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#ifndef QRSS_READER_DATE_HPP
-#define QRSS_READER_DATE_HPP
+#ifndef QRSS_READER_TEXT_INPUT_HPP
+#define QRSS_READER_TEXT_INPUT_HPP
 
 // -----------------------------------------------------------
 
@@ -32,13 +32,13 @@
 #include "Element.hpp"
 #endif // !QRSS_READER_ELEMENT_HPP
 
-// Include QString
-#ifndef QSTRING_H
-#include <QString>
-#endif // !QSTRING_H
+// Include QUrl
+#ifndef QURL_H
+#include <QUrl>
+#endif // !QURL_H
 
 // ===========================================================
-// Date
+// TextInput
 // ===========================================================
 
 namespace rss
@@ -47,17 +47,13 @@ namespace rss
 	// -----------------------------------------------------------
 
 	/**
-	  * Date - Date Element of RSS Channel & Item.
-	  *
-	  * @brief
-	  * Date - used by pubDate & lastBuildDate Elements.
-	  * Data stored with QString for easier cast (transformation).
+	  * TextInput - <textInput> Element class.
 	  *
 	  * @version 1.0
 	  * @since 21.07.2019
 	  * @authors Denis Z. (code4un@yandex.ru)
 	**/
-	struct Date final : public Element
+	struct TextInput final : public rss::Element
 	{
 
 		// -----------------------------------------------------------
@@ -66,33 +62,44 @@ namespace rss
 		// CONSTANTS
 		// ===========================================================
 
-		/** Date in QString format. **/
-		const QString mStringDate;
+		/** Title **/
+		const QString *const mTitle;
+
+		/** Description **/
+		const QString *const mDescription;
+
+		/** Name **/
+		const QString *const mName;
+
+		/** Link **/
+		const QUrl *const mLink;
 
 		// ===========================================================
 		// CONSTRUCTOR
 		// ===========================================================
 
 		/**
-		  * Date constructor.
+		  * TextInput constructor.
 		  *
-		  * @param pDate - QString with Date.
-		  * @param parentElement - Parent-Element.
-		  * @param pType - Element-Type, default is PubDate.
+		  * @param pElement - Parent-Element.
+		  * @param pTitle - Title.
+		  * @param pDescription - Description.
+		  * @param pName - Name.
+		  * @param pLink - Link.
 		  * @throws - no exceptions.
 		**/
-		explicit Date( const QString & pDate, Element *const parentElement, const Element::Type pType = Element::Type::PUB_DATE ) noexcept;
+		explicit TextInput( rss::Element *const pElement, const QString & pTitle, const QString & pDescription, const QString & pName, const QString & pLink ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR
 		// ===========================================================
 
 		/**
-		  * Date destructor.
+		  * TextInput destructor.
 		  *
 		  * @throws - no exceptions.
 		**/
-		virtual ~Date( ) noexcept final;
+		virtual ~TextInput( ) noexcept final;
 
 		// -----------------------------------------------------------
 
@@ -104,40 +111,26 @@ namespace rss
 		// DELETED CONSTRUCTORS & OPERATORS
 		// ===========================================================
 
-		/** @deleted Date const copy constructor. **/
-		Date( const Date & ) noexcept = delete;
+		/** @deleted TextInput const copy constructor. **/
+		TextInput( const TextInput & ) noexcept = delete;
 
-		/** @deleted Date copy-assignment operator. **/
-		Date & operator=( const Date & ) noexcept = delete;
+		/** @deleted TextInput copy-assignment operator. **/
+		TextInput & operator=( const TextInput & ) noexcept = delete;
 
-		/** @deleted Date move constructor. **/
-		Date( Date && ) noexcept = delete;
+		/** @deleted TextInput move constructor. **/
+		TextInput( TextInput && ) noexcept = delete;
 
-		/** @deleted Date move assignment operator. **/
-		Date & operator=( Date && ) noexcept = delete;
+		/** @deleted TextInput move assignment operator. **/
+		TextInput & operator=( TextInput && ) noexcept = delete;
 
 		// -----------------------------------------------------------
 
-	}; // rss::Date
-
-	// -----------------------------------------------------------
-
-	// ===========================================================
-	// Aliases
-	// ===========================================================
-
-	/** PubDate. **/
-	using PubDate = Date;
-
-	/** LastBuildDate. **/
-	using LastBuildDate = Date;
+	}; // rss::TextInput
 
 	// -----------------------------------------------------------
 
 } // rss
 
-#define QRSS_READER_DATE_DECL
-
 // -----------------------------------------------------------
 
-#endif // !QRSS_READER_DATE_HPP
+#endif // !QRSS_READER_TEXT_INPUT_HPP

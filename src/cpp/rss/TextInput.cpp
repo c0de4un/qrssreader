@@ -25,18 +25,66 @@
 // ===========================================================
 
 // HEADER
-#ifndef QRSS_READER_ID_STORAGE_HPP
-#include "IDStorage.hpp"
-#endif // !QRSS_READER_ID_STORAGE_HPP
+#ifndef QRSS_READER_TEXT_INPUT_HPP
+#include "TextInput.hpp"
+#endif // !QRSS_READER_TEXT_INPUT_HPP
 
 // ===========================================================
-// IDStorage
+// TextInput
 // ===========================================================
 
 namespace rss
 {
 
 	// -----------------------------------------------------------
+
+	// ===========================================================
+	// CONSTRUCTOR
+	// ===========================================================
+
+	/**
+	  * TextInput constructor.
+	  *
+	  * @param pElement - Parent-Element.
+	  * @param pTitle - Title.
+	  * @param pDescription - Description.
+	  * @param pName - Name.
+	  * @param pLink - Link.
+	  * @throws - no exceptions.
+	**/
+	TextInput::TextInput( rss::Element *const pElement, const QString & pTitle, const QString & pDescription, const QString & pName, const QString & pLink ) noexcept
+		: Element( rss::ElementType::TEXT_INPUT, pElement ),
+		  mTitle( pTitle.isEmpty( ) ? nullptr : new QString( pTitle ) ),
+		  mDescription( pDescription.isEmpty( ) ? nullptr : new QString( pDescription ) ),
+		  mName( pName.isEmpty( ) ? nullptr : new QString( pName ) ),
+		  mLink( pLink.isEmpty( ) ? nullptr : new QUrl( pLink ) )
+	{ }
+
+	// ===========================================================
+	// DESTRUCTOR
+	// ===========================================================
+
+	/**
+	  * TextInput destructor.
+	  *
+	  * @throws - no exceptions.
+	**/
+	TextInput::~TextInput( ) noexcept
+	{
+
+		// Delete Title
+		delete mTitle;
+
+		// Delete Description
+		delete mDescription;
+
+		// Delete Name
+		delete mName;
+
+		// Delete Link
+		delete mLink;
+
+	}
 
 	// -----------------------------------------------------------
 

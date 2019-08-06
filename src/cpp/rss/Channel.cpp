@@ -50,12 +50,12 @@ namespace rss
 	/**
 	  * Channel constructor.
 	  *
-	  * @param pUrl - Url.
-	  * @param pTitle - Title.
+	  * @param rssVersion - RSS-Version.
 	  * @throws - no exceptions.
 	**/
-	Channel::Channel( ) noexcept
+	Channel::Channel( const QString & rssVersion ) noexcept
 		: Element( ElementType::CHANNEL, nullptr ),
+		  mRSSVersion( rssVersion ),
 		  mElements( ),
 		  mElementsMutex( ),
 		  mItems( ),
@@ -143,9 +143,6 @@ namespace rss
 	**/
 	bool Channel::hasItemGUID( const QString & pGUID ) noexcept
 	{
-
-		// Thread-Lock.
-		QMutexLocker uniqueLock( &mItemsMutex );
 
 		// Search Item
 		return( getItemByGUID( pGUID ) != nullptr );
@@ -378,7 +375,7 @@ namespace rss
 		assert( guid_ptr->type == ElementType::GUID && "Channel::addItem - bad cast." );
 
 		// Check Repeats
-		assert( !hasItemGUID(  guid_ptr->mData ) && "Channel::addItem - Channel already have Item with the same GUID !" );
+		assert( searchItemByGUID( guid_ptr->mData ) == nullptr && "Channel::addItem - Channel already have Item with the same GUID !" );
 #else // !DEBUG
 		// Stop, if Item with the same GUID found.
 		if ( hasItemGUID( guid_ptr->mData ) )

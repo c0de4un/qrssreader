@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>SimpleButton.qml</file>
         <file>UrlDialog.qml</file>
+        <file>ChannelsListItemView.qml</file>
     </qresource>
 </RCC>

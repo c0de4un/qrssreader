@@ -58,6 +58,9 @@ int main(int argc, char *argv[])
     // Register MainWindowLogic.
     qmlRegisterType<MainWindowLogic>( "MainWindowLogic", 1, 0, "MainWindowLogic" );
 
+	//
+	qmlRegisterType<rss::ChannelModel>( "ChannelModel", 1, 0, "ChannelModel" );
+
     // Create QML Application Enigne
     QQmlApplicationEngine engine;
 
@@ -73,6 +76,18 @@ int main(int argc, char *argv[])
 
     // Load QML
     engine.load(url);
+
+	// Create ChannelsModel.
+	rss::ChannelModel *const channelModel( new rss::ChannelModel( ) );
+
+	// Read Test-RSS
+	//channelModel->readFile( "auto.rss", nullptr );
+
+	// Get root-Context.
+	QQmlContext *const rootContext( engine.rootContext( ) );
+
+	// Make ChannelMode available for all Views.
+	rootContext->setContextProperty( "rssModel", channelModel );
 
     //QWindow
     QWindow *const rootWindow( qobject_cast<QWindow*>( engine.rootObjects( ).first( ) ) );
@@ -93,8 +108,14 @@ int main(int argc, char *argv[])
     // Set Engine
     MainWindowLogic::mMainWindowLogicInstance->mQQmlApplicationEngine = &engine;
 
+	// Return-Code.
+	const auto returnCode( app.exec( ) );
+
+	// Delete ChannelModel.
+	delete channelModel;
+
     // Execute QT Application
-    return app.exec( );
+	return( returnCode );
 
 }
 

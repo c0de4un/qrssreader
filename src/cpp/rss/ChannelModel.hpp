@@ -102,6 +102,11 @@
 #include "Text.hpp"
 #endif // !QRSS_READER_TEXT_HPP
 
+// Include rss::TextInput
+#ifndef QRSS_READER_TEXT_INPUT_HPP
+#include "TextInput.hpp"
+#endif // !QRSS_READER_TEXT_INPUT_HPP
+
 // ===========================================================
 // ChannelModel
 // ===========================================================
@@ -397,6 +402,24 @@ namespace rss
 		**/
 		void clearChannels( ) noexcept;
 
+		Q_INVOKABLE QModelIndex getRootIndex( ) const noexcept
+		{
+			return( createIndex( 0, 0, nullptr ) );
+		}
+
+		/**
+		  * Reads RSS-file.
+		  *
+		  * (?) If RSS-Channel with the same link found,
+		  * and it's newer (pubDate, lastBuildDate), their data merged.
+		  *
+		  * @threadsafe - not thread-safe.
+		  * @param pSrc - File-Path.
+		  * @param pChannel - Channel-class to update from rss-document.
+		  * @throws - no exceptions.
+		**/
+		void readFile( const QString & pSrc, rss::Channel *const pChannel ) noexcept;
+
 		// ===========================================================
 		// OVERRIDE
 		// ===========================================================
@@ -442,6 +465,22 @@ namespace rss
 		virtual int rowCount( const QModelIndex & parentIndex = QModelIndex( ) ) const override;
 
 		/**
+		  * Counts Columns for a Model-Index.
+		  *
+		  * Not used in Tree-Models.
+		  *
+		  * @threadsafe - thread-lock used.
+		  * @param pIndex - Model-Index.
+		  * @returns - Columns count.
+		  * @throws - no exceptions.
+		**/
+		virtual int columnCount( const QModelIndex & pIndex = QModelIndex( ) ) const override
+		{
+			Q_UNUSED( pIndex )
+			return( 0 );
+		}
+
+		/**
 		  * Returns 'true' if the given Model-Index has sub-Items.
 		  *
 		  * @threadsafe - thread-lock used.
@@ -450,6 +489,15 @@ namespace rss
 		  * @throws - no exceptions.
 		**/
 		virtual bool hasChildren( const QModelIndex & pIndex = QModelIndex( ) ) const override;
+
+		/**
+		  * Returns Role-Names used by this Model.
+		  *
+		  * @threadsafe - not required.
+		  * @return - QHash for QML.
+		  * @throws - no exceptions.
+		**/
+		virtual QHash<int, QByteArray> roleNames( ) const override;
 
 		/**
 		  * Returns data to display as View-Header.

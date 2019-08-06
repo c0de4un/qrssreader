@@ -146,6 +146,8 @@ namespace rss
 
 } // rss
 
+#define QRSS_READER_CLOUD_DECL
+
 // -----------------------------------------------------------
 
 #endif // !QRSS_READER_CLOUD_HPP
