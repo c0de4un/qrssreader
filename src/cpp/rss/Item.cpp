@@ -29,6 +29,11 @@
 #include "Item.hpp"
 #endif // !QRSS_READER_ITEM_HPP
 
+// Include rss::Date
+#ifndef QRSS_READER_DATE_HPP
+#include "Date.hpp" // PubDate
+#endif // !QRSS_READER_DATE_HPP
+
 // ===========================================================
 // Item
 // ===========================================================
@@ -129,6 +134,33 @@ namespace rss
 		return( true );
 
 	} /// Item::setElement
+
+	/**
+	  * Checks if Item have newer date.
+	  *
+	  * @threadsafe - not thread-safe.
+	  * @param newItem - New-Item.
+	  * @param oldItem - Old-Item.
+	  * @returns - 'true' if new Item has newer date, or date-Elements not found.
+	  * @throws - no exceptions.
+	**/
+	bool Item::isNewer( const rss::Item *const newItem, const rss::Item *const oldItem ) noexcept
+	{
+
+		// Get new-PubDate Element.
+		const rss::PubDate *const pubDate_1( static_cast<rss::PubDate*>( newItem->getElement( rss::ElementType::PUB_DATE ) ) );
+
+		// Get old-PubDate Element.
+		const rss::PubDate *const pubDate_2( static_cast<rss::PubDate*>( oldItem->getElement( rss::ElementType::PUB_DATE ) ) );
+
+		// Return TRUE, if pubDate Element not found.
+		if ( pubDate_1 == nullptr && pubDate_2 == nullptr )
+			return( true );
+
+		// Compare Dates.
+		return( rss::PubDate::isNewer( pubDate_1, pubDate_2 ) );
+
+	} /// Item::isNewer
 
 	// ===========================================================
 	// METHODS

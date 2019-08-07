@@ -41,50 +41,72 @@ ApplicationWindow {
     {
         if ( !urlInputDialog.visible )
             urlInputDialog.show( );
-    }
+    } /// showUrlDialog
+
+    /**
+      * Shows Open-FileDialog to RSS file.
+      *
+      * If file exists, pass it to ChannelModel,
+      * which parse it & update data.
+    **/
+    function showOpenFileRSSDialog( )
+    {
+
+        // Show File-Dialog for RSS-File
+        openFSSFileDialog_id.open( );
+
+    } /// showOpenFileRSSDialog
+
+    /**
+      * Tries to open RSS-File using ChannelModel.
+      * If RSS data has been read, ChannelModel updates.
+    **/
+    function openRSSFile( rssFileUrl )
+    {
+
+        // Parse RSS File.
+        rssModel.parseRSSFile( rssFileUrl );
+
+        // Update ChannelsListView
+        //channelsListView_id.model = rssModel;
+        channelsListView_id.visible = true;
+        channelsListView_id.enabled = true;
+
+    } /// openRSSFile
 
     // ------------------------------------------------------------------------
 
-    // Left-Panel
-    Column {
+    // Channels ListView
+    ListView {
 
         // ID
-        id: leftPaneLCol_id
-        // Width
-        width: 240
-        // Height
-        height: mainWindow_id.height
+        id: channelsListView_id
+        // Anchors
+        anchors.fill: parent
+        // Model
+        model: rssModel
         // Visibility
-        visible: true
+        visible: false
+        // Enabled
+        enabled: false
 
-        // Channels ListView
-        ListView {
-            // ID
-            id: channelsListView_id
-            // Anchors
-            anchors.fill: parent
-            // Model
-            model: rssModel
-            // Delegate
-            delegate: Rectangle {
+        // Delegate
+        delegate: Rectangle {
 
-                // Width
-                width: parent.width
-                // Height
-                height: 80
-                // Text
-                Text {
-                    text: rssModel.data( index, title )
-                }
-                /// Text
+            // Width
+            width: parent.width
+            // Height
+            height: 80
 
-            } // Delegate
-        }
+            // Text
+            Text {
+                text: rssModel.data( index, title )
+            }
+            /// Text
 
-        /// Channels ListView
+        } // Delegate
 
-    }
-    /// Left-Panel
+    } /// Channels ListView
 
     // ------------------------------------------------------------------------
 
@@ -102,8 +124,12 @@ ApplicationWindow {
             // Title
             title: "App"
             Action {
-                text: "+RSS"
+                text: "Open URL"
                 onTriggered: showUrlDialog( )
+            }
+            Action {
+                text: "Open File"
+                onTriggered: showOpenFileRSSDialog( )
             }
             Action {
                 text: "About"
@@ -115,6 +141,37 @@ ApplicationWindow {
         } /// Application
     }
     /// Menu
+
+    // ------------------------------------------------------------------------
+
+    // Open FileDialog for RSS
+    FileDialog {
+
+        // ID
+        id: openFSSFileDialog_id
+        // Title
+        title: "Open RSS"
+        // Default Path
+        folder: shortcuts.home
+        // Filters
+        nameFilters: [ "RSS (*.rss *.xml)" ]
+        // Modality
+        modality: Qt.Dialog
+        // Visibility
+        visible: false
+        // Multi-Selection
+        selectMultiple: false
+        // Select Exisitin
+        selectExisting: true
+        // File-Only
+        selectFolder: false
+
+        // OnAccepted
+        onAccepted: openRSSFile( openFSSFileDialog_id.fileUrl )
+        // OnRejected
+        //onRejected: openFSSFileDialog_id.close( )
+
+    } /// Open FileDialog for RSS
 
     // ------------------------------------------------------------------------
 

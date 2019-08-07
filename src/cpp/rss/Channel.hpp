@@ -115,13 +115,13 @@ namespace rss
 		QMap<ElementType, element_ptr_t> mElements;
 
 		/** Elements Thread-Lock. **/
-		QMutex mElementsMutex;
+		mutable QMutex mElementsMutex;
 
 		/** Items. **/
 		QVector<item_ptr_t> mItems;
 
 		/** Items Thread-Lock. **/
-		QMutex mItemsMutex;
+		mutable QMutex mItemsMutex;
 
 		// ===========================================================
 		// DELETED CONSTRUCTORS & OPERATORS
@@ -197,6 +197,15 @@ namespace rss
 		element_ptr_t getElement( const ElementType pType ) noexcept;
 
 		/**
+		  * Count Items.
+		  *
+		  * @threadsafe - thread-lock used.
+		  * @return - Items coun.
+		  * @throws - no exceptions.
+		**/
+		int countItems( ) const noexcept;
+
+		/**
 		  * Searches for a Item.
 		  *
 		  * @threadsafe - thread-lock used.
@@ -221,10 +230,11 @@ namespace rss
 		  *
 		  * @thread_safety - thread-lock used.
 		  * @param pElement - Element.
+		  * @param pReplace - 'true' to replace already set Element. Used for merging (moveing, updating).
 		  * @return - 'true' if set, 'false' if same Element already set.
 		  * @throws - no exceptions.
 		**/
-		bool setElement( element_ptr_t pElement ) noexcept;
+		bool setElement( element_ptr_t pElement, const bool pReplace = false ) noexcept;
 
 		/**
 		  * Returns 'true' if Channel have Element with a provided Element-Type.
@@ -277,6 +287,18 @@ namespace rss
 		  * @throws - no exceptions.
 		**/
 		virtual bool empty( ) const noexcept final;
+
+		/**
+		  * Merge (move Elements from source to a destination Channel).
+		  *
+		  * (?) All replaced Elements automatically deleted.
+		  *
+		  * @threadsafe - thread-lock used.
+		  * @param srcChannel - Channel to move Elements from.
+		  * @param dstChannel - Channel to move Elements to.
+		  * @throws - no exceptions.
+		**/
+		static void merge( rss::Channel *const srcChannel, rss::Channel *const dstChannel ) noexcept;
 
 		/**
 		  * Count sub-Elements.

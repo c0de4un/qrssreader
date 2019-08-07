@@ -29,63 +29,18 @@
 #include "SAXRSSHandler.hpp"
 #endif // !QRSS_READER_SAX_RSS_HANDLER_HPP
 
-// Include rss::Channel
-#ifndef QRSS_READER_CHANNEL_HPP
-#include "../rss/Channel.hpp"
-#endif // !QRSS_READER_CHANNEL_HPP
+// Include rss::ChannelModel
+#ifndef Q_RSS_READER_CHANNEL_MODEL_HPP
+#include "../rss/ChannelModel.hpp"
+#endif // !Q_RSS_READER_CHANNEL_MODEL_HPP
 
-// Include rss::Category
-#ifndef QRSS_READER_SOURCE_HPP
-#include "../rss/Source.hpp"
-#endif // !QRSS_READER_SOURCE_HPP
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
 
-// Include rss::Cloud
-#ifndef QRSS_READER_CLOUD_HPP
-#include "../rss/Cloud.hpp"
-#endif // !QRSS_READER_CLOUD_HPP
+// Include QDebug
+#ifndef QDEBUG_H
+#include <qdebug.h>
+#endif // !QDEBUG_H
 
-// Include rss::Date
-#ifndef QRSS_READER_DATE_HPP
-#include "../rss/Date.hpp"
-#endif // !QRSS_READER_DATE_HPP
-
-// Include rss::Enclosure
-#ifndef QRSS_READER_ENCLOSURE_HPP
-#include "../rss/Enclosure.hpp"
-#endif // !QRSS_READER_ENCLOSURE_HPP
-
-// Include rss::Integer
-#ifndef QRSS_READER_INTEGER_HPP
-#include "../rss/Integer.hpp"
-#endif // !QRSS_READER_INTEGER_HPP
-
-// Include rss::Item
-#ifndef QRSS_READER_ITEM_HPP
-#include "../rss/Item.hpp"
-#endif // !QRSS_READER_ITEM_HPP
-
-// Include rss::Image
-#ifndef QRSS_READER_IMAGE_HPP
-#include "../rss/Image.hpp"
-#endif // !QRSS_READER_IMAGE_HPP
-
-// Include rss::Link
-#ifndef QRSS_READER_LINK_HPP
-#include "../rss/Link.hpp"
-#endif // !QRSS_READER_LINK_HPP
-
-// Include rss::Text
-#ifndef QRSS_READER_TEXT_HPP
-#include "../rss/Text.hpp"
-#endif // !QRSS_READER_TEXT_HPP
-
-// Include rss::TextInput
-#ifndef QRSS_READER_TEXT_INPUT_HPP
-#include "../rss/TextInput.hpp"
-#endif // !QRSS_READER_TEXT_INPUT_HPP
-
-#if defined( QT_DEBUG ) // DEBUG
-#include <QDebug>
 #endif // DEBUG
 
 // ===========================================================
@@ -105,15 +60,24 @@ namespace rss
 	  * SAXRSSHandler constructor.
 	  *
 	  * @param pChannel - Channel-class to update directly.
+	  * @param pModel - ChannelModel.
 	  * @throws - no exceptions.
 	**/
-	SAXRSSHandler::SAXRSSHandler( rss::Channel *const pChannel ) noexcept
+	SAXRSSHandler::SAXRSSHandler( rss::Channel *const pChannel, rss::ChannelModel *const pModel ) noexcept
 		: mChannel( pChannel ),
 		  mCurrState( SAXRSSHandler::RSSPosition::RSS_CHANNEL_OPEN ),
 		  mPrevState( SAXRSSHandler::RSSPosition::RSS_CHANNEL_OPEN ),
 		  mValues( ),
-		  mItem( )
-	{ }
+		  mItem( ),
+		  mChannelModel( pModel )
+	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Check ChannelModel instance.
+		assert( pModel != nullptr && "SAXRSSHandler::constructor - ChannelModel is null !" );
+#endif // DEBUG
+
+	}
 
 	// ===========================================================
 	// DESTRUCTOR
@@ -128,8 +92,8 @@ namespace rss
 	{
 
 		// Delete Channel Instance.
-		if ( mChannel != nullptr )
-			delete mChannel;
+		//if ( mChannel != nullptr )
+			//delete mChannel;
 
 	}
 
@@ -1130,6 +1094,9 @@ namespace rss
 
 			// Set State
 			mCurrState = RSS_CHANNEL_OPEN;
+
+			// Check dublicates.
+			mChannel = mChannelModel->addChannel( mChannel, true );
 
 			// Stop
 			break;

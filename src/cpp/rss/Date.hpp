@@ -37,6 +37,11 @@
 #include <QString>
 #endif // !QSTRING_H
 
+// Include QDate
+#ifndef QDATETIME_H
+#include <qdatetime.h>
+#endif // !QDATETIME_H
+
 // ===========================================================
 // Date
 // ===========================================================
@@ -93,6 +98,20 @@ namespace rss
 		  * @throws - no exceptions.
 		**/
 		virtual ~Date( ) noexcept final;
+
+		// ===========================================================
+		// METHODS
+		// ===========================================================
+
+		/**
+		  * Returns 'true' if src-Date is newer then dst-Date.
+		  *
+		  * @threadsafe - not thread-safe.
+		  * @param srcDate - Date #1.
+		  * @param dstDate - Date #2.
+		  * @throws - no exceptions.
+		**/
+		static bool isNewer( const Date *const srcDate, const Date *const dstDate ) noexcept;
 
 		// -----------------------------------------------------------
 

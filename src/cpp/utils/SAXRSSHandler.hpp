@@ -122,6 +122,12 @@ namespace rss
 }
 #endif // !QRSS_READER_DATE_DECL
 
+// Forward-declare rss:ChannelModel
+#ifndef Q_RSS_READER_CHANNEL_MODEL_DECL
+#define Q_RSS_READER_CHANNEL_MODEL_DECL
+namespace rss{ class ChannelModel; }
+#endif // !Q_RSS_READER_CHANNEL_MODEL_DECL
+
 // ===========================================================
 // rss::SAXRSSHandler
 // ===========================================================
@@ -324,6 +330,9 @@ namespace rss
 		/** Item. **/
 		rss::Item * mItem;
 
+		/** ChannelModel. **/
+		rss::ChannelModel *const mChannelModel;
+
 		// ===========================================================
 		// METHODS
 		// ===========================================================
@@ -363,9 +372,10 @@ namespace rss
 		  * SAXRSSHandler constructor.
 		  *
 		  * @param pChannel - Channel-class to update directly.
+		  * @param pModel - ChannelModel.
 		  * @throws - no exceptions.
 		**/
-		explicit SAXRSSHandler( rss::Channel *const pChannel ) noexcept;
+		explicit SAXRSSHandler( rss::Channel *const pChannel, rss::ChannelModel *const pModel ) noexcept;
 
 		// ===========================================================
 		// DESTRUCTOR

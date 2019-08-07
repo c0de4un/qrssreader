@@ -67,6 +67,32 @@ namespace rss
 	**/
 	Date::~Date( ) noexcept = default;
 
+	// ===========================================================
+	// METHODS
+	// ===========================================================
+
+	/**
+	  * Returns 'true' if src-Date is newer then dst-Date.
+	  *
+	  * @threadsafe - not thread-safe.
+	  * @param srcDate - Date #1.
+	  * @param dstDate - Date #2.
+	  * @throws - no exceptions.
+	**/
+	bool Date::isNewer( const Date *const srcDate, const Date *const dstDate ) noexcept
+	{
+
+		// src-Date.
+		QDate date_1( QDate::fromString( srcDate->mStringDate ) );
+
+		// dst-Date.
+		QDate date_2( QDate::fromString( dstDate->mStringDate ) );
+
+		// Comapre.
+		return( date_1 > date_2 );
+
+	}
+
 	// -----------------------------------------------------------
 
 } // rss

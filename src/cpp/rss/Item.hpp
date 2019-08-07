@@ -121,6 +121,17 @@ namespace rss
 		**/
 		bool setElement( element_ptr_t pElement ) noexcept;
 
+		/**
+		  * Checks if Item have newer date.
+		  *
+		  * @threadsafe - not thread-safe.
+		  * @param newItem - New-Item.
+		  * @param oldItem - Old-Item.
+		  * @returns - 'true' if new Item has newer date, or date-Elements not found.
+		  * @throws - no exceptions.
+		**/
+		static bool isNewer( const rss::Item *const newItem, const rss::Item *const oldItem ) noexcept;
+
 		// ===========================================================
 		// METHODS
 		// ===========================================================

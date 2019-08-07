@@ -34,6 +34,15 @@
 #include "Text.hpp"
 #endif // !QRSS_READER_TEXT_HPP
 
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+
+// Include QDebug
+#ifndef QDEBUG_H
+#include <qdebug.h>
+#endif // !QDEBUG_H
+
+#endif // DEBUG
+
 // ===========================================================
 // Channel
 // ===========================================================
@@ -60,7 +69,14 @@ namespace rss
 		  mElementsMutex( ),
 		  mItems( ),
 		  mItemsMutex( )
-	{ }
+	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << id << "::constructor";
+#endif // DEBUG
+
+	}
 
 	// ===========================================================
 	// DESTRUCTOR
@@ -73,6 +89,11 @@ namespace rss
 	**/
 	Channel::~Channel( ) noexcept
 	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::destructor";
+#endif // DEBUG
 
 		// Release Elements
 		releaseElements( );
@@ -97,6 +118,11 @@ namespace rss
 	Channel::element_ptr_t Channel::getElement( const ElementType pType ) noexcept
 	{
 
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::getElement";
+#endif // DEBUG
+
 		// Thread-Lock
 		QMutexLocker threadLock( &mElementsMutex );
 
@@ -113,6 +139,29 @@ namespace rss
 	} /// Channel::getElement
 
 	/**
+	  * Count Items.
+	  *
+	  * @threadsafe - thread-lock used.
+	  * @return - Items coun.
+	  * @throws - no exceptions.
+	**/
+	int Channel::countItems( ) const noexcept
+	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::countItems";
+#endif // DEBUG
+
+		// Thread-Lock
+		QMutexLocker uLock( &mItemsMutex );
+
+		// Count Items
+		return( mItems.size( ) );
+
+	} /// Channel::countItems
+
+	/**
 	  * Searches for a Item.
 	  *
 	  * @threadsafe - thread-lock used.
@@ -124,9 +173,15 @@ namespace rss
 	{
 
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::getItem";
+
 		// Check range.
 		assert( pIndex < mItems.size( ) && "Channel::getItem - Item index is out of the range !" );
 #endif // DEBUG
+
+		// Thread-Lock.
+		QMutexLocker uLock( &mItemsMutex );
 
 		// Return Item.
 		return( mItems.at( pIndex ) );
@@ -144,6 +199,11 @@ namespace rss
 	bool Channel::hasItemGUID( const QString & pGUID ) noexcept
 	{
 
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::hasItemGUID";
+#endif // DEBUG
+
 		// Search Item
 		return( getItemByGUID( pGUID ) != nullptr );
 
@@ -159,8 +219,10 @@ namespace rss
 	bool Channel::hasElement( const ElementType pType ) noexcept
 	{
 
-		// Thread-Lock.
-		QMutexLocker uniqueLock( &mElementsMutex );
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::hasElement";
+#endif // DEBUG
 
 		// Search Element.
 		return( getElement( pType ) != nullptr );
@@ -172,11 +234,17 @@ namespace rss
 	  *
 	  * @thread_safety - thread-lock used.
 	  * @param pElement - Element.
+	  * @param pReplace - 'true' to replace already set Element. Used for merging (moveing, updating).
 	  * @return - 'true' if set, 'false' if same Element already set.
 	  * @throws - no exceptions.
 	**/
-	bool Channel::setElement( Channel::element_ptr_t pElement ) noexcept
+	bool Channel::setElement( Channel::element_ptr_t pElement, const bool pReplace ) noexcept
 	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::setElement";
+#endif // DEBUG
 
 		// Thread-Lock.
 		QMutexLocker uniqueLock( &mElementsMutex );
@@ -186,15 +254,26 @@ namespace rss
 
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
 		// Check Element Repeat.
-		assert( elementPos_ == mElements.cend( ) && "Channel::setElement - Channel already have such Element ! RSS data corrupt ?" );
+		if ( !pReplace )
+			assert( elementPos_ == mElements.cend( ) && "Channel::setElement - Channel already have such Element ! RSS data corrupt ?" );
 #else // !DEBUG
 		// Cancel, if Element already stored.
-		if ( elementPos_ != mElements.cend( ) )
+		if ( !pReplace && elementPos_ != mElements.cend( ) )
 			return( false );
 #endif // DEBUG
 
-		// Add Element.
-		mElements.insert( pElement->type, pElement );
+		// Delete previous Element.
+		if ( elementPos_ != mElements.cend( ) )
+			delete elementPos_.value( );
+
+		// Set Element.
+		mElements[pElement->type] = pElement;
+
+		// Remove Element.
+		//mElements.erase( elementPos_ );
+
+		// Add new Element.
+		//mElements.insert( pElement->type, pElement );
 
 		// Return TRUE
 		return( true );
@@ -213,6 +292,11 @@ namespace rss
 	**/
 	Channel::item_ptr_t Channel::getItemByGUID( const QString & pGUID ) noexcept
 	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::getItemGUID";
+#endif // DEBUG
 
 		// Thread-Lock.
 		QMutexLocker uLock( &mItemsMutex );
@@ -315,6 +399,62 @@ namespace rss
 	{ return( mElements.empty( ) ); }
 
 	/**
+	  * Merge (move Elements from source to a destination Channel).
+	  *
+	  * (?) All replaced Elements automatically deleted.
+	  *
+	  * @threadsafe - thread-lock used.
+	  * @param srcChannel - Channel to move Elements from.
+	  * @param dstChannel - Channel to move Elements to.
+	  * @throws - no exceptions.
+	**/
+	void Channel::merge( rss::Channel *const srcChannel, rss::Channel *const dstChannel ) noexcept
+	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << dstChannel->id << "::merge";
+#endif // DEBUG
+
+		// Move Elements
+		for( rss::Element * srcElement : srcChannel->mElements )
+		{
+
+			// Set Element (override/replace if required).
+			if ( !dstChannel->setElement( srcElement, true ) )
+			{// Element wasn't added.
+
+				// Delete Element.
+				delete srcElement;
+
+			} /// Set Element
+
+		} /// Move Elements
+
+		// Clear Elements collection to move.
+		srcChannel->mElements.clear( );
+
+		// Move Items
+		for( rss::Item * srcItem : srcChannel->mItems )
+		{
+
+			// Move Item
+			if ( !dstChannel->addItem( srcItem ) )
+			{// Item not added.
+
+				// Delete Item.
+				delete srcItem;
+
+			} /// Move Item
+
+		} // Move Items.
+
+		// Clear Items to Move.
+		srcChannel->mItems.clear( );
+
+	} /// Channel::merge
+
+	/**
 	  * Count sub-Elements.
 	  *
 	  * @threadsafe - not thread-safe.
@@ -334,6 +474,11 @@ namespace rss
 	**/
 	Channel::item_ptr_t Channel::searchItemByGUID( const QString & pGUID ) const noexcept
 	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::searchItemByGUID";
+#endif // DEBUG
 
 		// Search Item
 		for( item_ptr_t item_ : mItems )
@@ -364,23 +509,23 @@ namespace rss
 	bool Channel::addItem( Channel::item_ptr_t pItem ) noexcept
 	{
 
-		// Thread-Lock
-		QMutexLocker threadLock( &mItemsMutex );
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::addItem";
+#endif // DEBUG
 
 		// Get GUID
 		const rss::GUID *const guid_ptr( static_cast<rss::GUID*>( pItem->getElement( ElementType::GUID ) ) );
 
-#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-		// Check GUID
-		assert( guid_ptr->type == ElementType::GUID && "Channel::addItem - bad cast." );
+		// Get Item.
+		rss::Item *const prevItem_( guid_ptr != nullptr ? getItemByGUID( guid_ptr->mData ) : nullptr );
 
-		// Check Repeats
-		assert( searchItemByGUID( guid_ptr->mData ) == nullptr && "Channel::addItem - Channel already have Item with the same GUID !" );
-#else // !DEBUG
-		// Stop, if Item with the same GUID found.
-		if ( hasItemGUID( guid_ptr->mData ) )
+		// GUID-Check.
+		if ( prevItem_ != nullptr && !rss::Item::isNewer( pItem, prevItem_ ) )
 			return( false );
-#endif // DEBUG
+
+		// Thread-Lock
+		QMutexLocker threadLock( &mItemsMutex );
 
 		// Add Item.
 		mItems.push_back( pItem );
@@ -400,6 +545,11 @@ namespace rss
 	**/
 	void Channel::releaseItems( ) noexcept
 	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::releaseItems";
+#endif // DEBUG
 
 		// Thread-Lock
 		QMutexLocker threadLock( &mItemsMutex );
@@ -454,6 +604,11 @@ namespace rss
 	**/
 	void Channel::releaseElements( ) noexcept
 	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "Channel#" << QString::number( id ) << "::releaseElements";
+#endif // DEBUG
 
 		// Thread-Lock
 		QMutexLocker threadLock( &mElementsMutex );

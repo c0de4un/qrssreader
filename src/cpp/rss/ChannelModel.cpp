@@ -34,7 +34,7 @@
 #include "../utils/SAXRSSHandler.hpp"
 #endif // !QRSS_READER_SAX_RSS_HANDLER_HPP
 
-#if defined( QT_DEFINED ) || defined( DEBUG ) // DEBUG
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
 
 // Include QDebug
 #ifndef QDEBUG_H
@@ -113,6 +113,54 @@ namespace rss
 		return( mChannels.at( pIndex ) );
 
 	} /// ChannelModel::getChannelByIndex
+
+	/**
+	  * Searches added Channel insatnce using Link Element as Key.
+	  *
+	  * (?) Used by RSS-parser to check if Channel with the same
+	  * Link already added. Allows to update existing Channel,
+	  * instead of dublication.
+	  *
+	  * @threadsafe - thread-lock used.
+	  * @param pLink - Link Element Value (Url).
+	  * @returns - Channel if found, null if not.
+	  * @throws - no exceptions.
+	**/
+	ChannelModel::channel_ptr_t ChannelModel::getChannelByLink( const QUrl & pLink ) const noexcept
+	{
+
+		// Thread-Lock.
+		QMutexLocker uLock( &mChannelsMutex );
+
+		// Link Element.
+		rss::Link * link_( nullptr );
+
+		// Search Channel
+		for( channel_ptr_t channel_ : mChannels )
+		{
+
+			// Get Channel Link Element.
+			link_ = static_cast<rss::Link*>( channel_->getElement( rss::ElementType::LINK ) );
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+			// Link - required ELement of every Channel.
+			assert( link_ != nullptr && "ChannelModel::getChannelByLink - Link Element not found !" );
+#else // !DEBUG
+			// Cancel, if Link not found.
+			if ( link_ == nullptr )
+				continue;
+#endif // DEBUG
+
+			// Compare Links.
+			if ( link_->mUrl == pLink )
+				return( channel_ );
+
+		} /// Search Channel
+
+		// Return null.
+		return( channel_ptr_t( nullptr ) );
+
+	} /// ChannelModel::getChannelByLink
 
 	/**
 	  * Returns RSS Channel-class data (title, description, image, etc).
@@ -453,6 +501,83 @@ namespace rss
 	} /// ChannelModel::getItemData
 
 	/**
+	  * Called when Channel-class data created or updated.
+	  *
+	  * @threadsafe - thread-lock used.
+	  * @param pChannel - Channel instance.
+	  * @param pLock - 'true' to use thread-lock.
+	  * @throws - no exceptions.
+	**/
+	rss::Channel * ChannelModel::addChannel( rss::Channel *const pChannel, const bool pLock ) noexcept
+	{
+
+		// Get Link Element.
+		rss::Link *const newLink_( static_cast<rss::Link*>( pChannel->getElement( rss::ElementType::LINK ) ) );
+
+		// Search Channel using Link.
+		if ( newLink_ != nullptr )
+		{
+
+			// Get Channel.
+			rss::Channel *const prevChannel( getChannelByLink( newLink_->mUrl ) );
+
+			// Compare Channels & merge (move).
+			if ( prevChannel != nullptr && prevChannel != pChannel && prevChannel->id != pChannel->id )
+			{
+
+				// Merge Channels (move Elements & Items from temp. to created).
+				rss::Channel::merge( pChannel, prevChannel );
+
+				// Return
+				return( prevChannel );
+
+			}
+
+		} /// Search Channel using Link.
+
+		// Lock
+		if ( pLock )
+		{
+
+			// Lock
+			QMutexLocker uLock( &mChannelsMutex );
+
+			// Add Channel
+			mChannels.push_back( pChannel );
+
+		}
+		else
+			mChannels.push_back( pChannel ); // Add Channel
+
+		// Return new Channel.
+		return( pChannel );
+
+	}
+
+	/**
+	  * Called after RSS parsing complete.
+	  * Cause attach Views to Update.
+	  *
+	  * @threadsafe - not thread-safe.
+	  * @throws - no exceptions.
+	**/
+	void ChannelModel::onChannelsUpdated( ) noexcept
+	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "ChannelModel::onChannelsUpdated";
+#endif // DEBUG
+
+		// Create invalid Model-Index as root-Index.
+		QModelIndex modelIndex_( createIndex( 0, 0, nullptr ) );
+
+		// Emit signal.
+		emit dataChanged( modelIndex_, modelIndex_ );
+
+	}
+
+	/**
 	  * Deletes all Channels.
 	  *
 	  * @brief
@@ -496,12 +621,21 @@ namespace rss
 	{
 
 		// Create SAXRSSHandler instance.
-		rss::SAXRSSHandler rssHandler( pChannel );
+		rss::SAXRSSHandler rssHandler( pChannel, this );
 
 		// Create QFile.
 		QFile rssFile( pSrc );
 
+#if defined( QT_DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "ChannelModel::readFile#" << pSrc;
+
+		// Check FileExistance
 		assert( rssFile.exists( ) && "ChannelModel::readFile - file not found !" );
+#else // !DEBUG
+		if ( !rssFile.exists( ) )
+			return;
+#endif // DEBUG
 
 		// Create Xml-InputSource
 		QXmlInputSource inputSource( &rssFile );
@@ -515,11 +649,20 @@ namespace rss
 		// Parse SAX Xml RSS-Document.
 		xmlReader.parse( &inputSource );
 
-		// Add Channel
-		if ( pChannel == nullptr )
-			mChannels.push_back( rssHandler.getChannel( ) );
+		// Update
+		onChannelsUpdated( );
 
 	} /// ChannelModel::readFile
+
+	/**
+	  * Read RSS-file using QUrl.
+	  *
+	  * @threadsafe - thread-lock used, only if required.
+	  * @param pUrl - URL from QML.
+	  * @throws - no exceptions.
+	**/
+	void ChannelModel::parseRSSFile( const QUrl pUrl ) noexcept
+	{ readFile( pUrl.toLocalFile( ), nullptr ); }
 
 	// ===========================================================
 	// OVERRIDE
@@ -538,6 +681,9 @@ namespace rss
 	{
 
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "ChannelModel::data, index.row=" << pIndex.row( ) << "index.col=" << pIndex.column( ) << "index.pointer=" << QString( pIndex.internalPointer( ) != nullptr );
+
 		// Check Model-Index.
 		assert( pIndex.isValid( ) && "ChannelModel::data - invalid Model-Index ! Root can't provide any data to display." );
 #else // !DEBUG
@@ -607,6 +753,11 @@ namespace rss
 	**/
 	QModelIndex ChannelModel::index( int pRow, int pCol, const QModelIndex & parentIndex ) const
 	{
+
+#if defined( QT_DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "ChannelModel::index, index.row=" << parentIndex.row( ) << "index.col=" << parentIndex.column( ) << "index.pointer=" << QString( parentIndex.internalPointer( ) != nullptr );
+#endif // DEBUG
 
 		// Return root, if Model-Index is invalid.
 		if ( pRow < 0 || pCol < 0 || !parentIndex.isValid( ) )
@@ -687,6 +838,11 @@ namespace rss
 	QModelIndex ChannelModel::parent( const QModelIndex & pIndex ) const
 	{
 
+#if defined( QT_DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "ChannelModel::parent, index.row=" << pIndex.row( ) << "index.col=" << pIndex.column( ) << "index.pointer=" << QString( pIndex.internalPointer( ) != nullptr );
+#endif // DEBUG
+
 		// Cancel, if root || invalid.
 		if ( !pIndex.isValid( ) || pIndex.internalPointer( ) == nullptr )
 			return( QModelIndex( ) );
@@ -726,13 +882,43 @@ namespace rss
 	int ChannelModel::rowCount( const QModelIndex & parentIndex ) const
 	{
 
-		// Invalid Model-Index.
+#if defined( QT_DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "ChannelModel::rowCount, index.row=" << parentIndex.row( ) << "index.col=" << parentIndex.column( ) << "index.pointer=" << QString( parentIndex.internalPointer( ) != nullptr );
+#endif // DEBUG
+
+		// roo-ModelIndex (invalid ModelIndex).
 		if ( !parentIndex.isValid( ) )
-			return( -1 );
+		{
+
+			// Thread-Lock
+			QMutexLocker uLock( &mChannelsMutex );
+
+			// Return Channels count.
+			return( mChannels.size( ) );
+
+		}
 
 		// root Model-Index.
-		if ( parentIndex.row( ) == 0 && parentIndex.internalPointer( ) == nullptr )
-			return( mChannels.size( ) );
+		if ( parentIndex.row( ) >= 0 && parentIndex.internalPointer( ) == nullptr )
+		{
+
+			// Get Channel.
+			rss::Channel *const channel_( getChannelByIndex( parentIndex.row( ) ) );
+
+#if defined( DEBUG ) // DEBUG
+			// Check Channel.
+			assert( channel_ != nullptr && "ChannelModel::rowCount - Channel is null !" );
+#else // !DEBUG
+			// Return 0, if Channel is null.
+			if ( channel_ == nullptr )
+				return( 0 );
+#endif // DEBUG
+
+			// Return Channel's Items Count.
+			return( channel_->countItems( ) );
+
+		} // root.
 
 		// Get Element.
 		rss::Element *const element( static_cast<rss::Element*>( parentIndex.internalPointer( ) ) );
@@ -757,6 +943,11 @@ namespace rss
 	**/
 	bool ChannelModel::hasChildren( const QModelIndex & pIndex ) const
 	{
+
+#if defined( QT_DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "ChannelModel::hasChildren, index.row=" << pIndex.row( ) << "index.col=" << pIndex.column( ) << "index.pointer=" << QString( pIndex.internalPointer( ) != nullptr );
+#endif // DEBUG
 
 		// Invalid Model-Index == root.
 		if ( !pIndex.isValid( ) || pIndex.internalPointer( ) == nullptr )

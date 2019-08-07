@@ -141,6 +141,11 @@ namespace rss
 		Q_OBJECT
 
 		// ===========================================================
+		// SIGNALS
+		// ===========================================================
+
+
+		// ===========================================================
 		// CONFIG
 		// ===========================================================
 
@@ -370,6 +375,20 @@ namespace rss
 		channel_ptr_t getChannelByIndex( const int pIndex ) const noexcept;
 
 		/**
+		  * Searches added Channel insatnce using Link Element as Key.
+		  *
+		  * (?) Used by RSS-parser to check if Channel with the same
+		  * Link already added. Allows to update existing Channel,
+		  * instead of dublication.
+		  *
+		  * @threadsafe - thread-lock used.
+		  * @param pLink - Link Element Value (Url).
+		  * @returns - Channel if found, null if not.
+		  * @throws - no exceptions.
+		**/
+		channel_ptr_t getChannelByLink( const QUrl & pLink ) const noexcept;
+
+		/**
 		  * Returns RSS Channel-class data (title, description, image, etc).
 		  *
 		  * @threadsafe - must be called only while thread-lock locked.
@@ -402,10 +421,24 @@ namespace rss
 		**/
 		void clearChannels( ) noexcept;
 
-		Q_INVOKABLE QModelIndex getRootIndex( ) const noexcept
-		{
-			return( createIndex( 0, 0, nullptr ) );
-		}
+		/**
+		  * Called when Channel-class data created or updated.
+		  *
+		  * @threadsafe - thread-lock used.
+		  * @param pChannel - Channel instance.
+		  * @param pLock - 'true' to use thread-lock.
+		  * @throws - no exceptions.
+		**/
+		rss::Channel * addChannel( rss::Channel *const pChannel, const bool pLock ) noexcept;
+
+		/**
+		  * Called after RSS parsing complete.
+		  * Cause attach Views to Update.
+		  *
+		  * @threadsafe - not thread-safe.
+		  * @throws - no exceptions.
+		**/
+		void onChannelsUpdated( ) noexcept;
 
 		/**
 		  * Reads RSS-file.
@@ -419,6 +452,15 @@ namespace rss
 		  * @throws - no exceptions.
 		**/
 		void readFile( const QString & pSrc, rss::Channel *const pChannel ) noexcept;
+
+		/**
+		  * Read RSS-file using QUrl.
+		  *
+		  * @threadsafe - thread-lock used, only if required.
+		  * @param pUrl - URL from QML.
+		  * @throws - no exceptions.
+		**/
+		Q_INVOKABLE void parseRSSFile( const QUrl pUrl ) noexcept;
 
 		// ===========================================================
 		// OVERRIDE
