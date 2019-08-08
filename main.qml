@@ -1,6 +1,6 @@
 import QtQuick 2.13
 import QtQuick.Window 2.13 // ApplicationWindow
-import QtQuick.Controls 2.5 // Views
+import QtQuick.Controls 2.5 // Views & Widgets
 import QtQuick.Dialogs 1.2 // Dialog
 import QtQml.Models 2.12 // DelegateModel
 
@@ -17,9 +17,9 @@ ApplicationWindow {
     // Visibility
     visible: true
     // Width
-    width: 1280
+    width: 320
     // Height
-    height: 720
+    height: 480
     // Title
     title: qsTr("Q-RSSReader")
 
@@ -39,8 +39,10 @@ ApplicationWindow {
     // Show UrlDialog
     function showUrlDialog( )
     {
+
         if ( !urlInputDialog.visible )
             urlInputDialog.show( );
+
     } /// showUrlDialog
 
     /**
@@ -53,7 +55,8 @@ ApplicationWindow {
     {
 
         // Show File-Dialog for RSS-File
-        openFSSFileDialog_id.open( );
+        if ( !openFSSFileDialog_id.visible )
+            openFSSFileDialog_id.open( );
 
     } /// showOpenFileRSSDialog
 
@@ -67,29 +70,33 @@ ApplicationWindow {
         // Parse RSS File.
         rssModel.parseRSSFile( rssFileUrl );
 
-        // Update ChannelsListView
-        //channelsListView_id.model = rssModel;
+        // Show ChannelsListView
         channelsListView_id.visible = true;
         channelsListView_id.enabled = true;
 
     } /// openRSSFile
 
+    /**
+      * Shows AboutAppDialog.
+    **/
+    function showAboutAppDialog( )
+    {
+
+        // Show AboutAppDialog
+        if ( !about_DialogID.visible )
+            about_DialogID.open( );
+
+    } /// showAboutAppDialog
+
     // ------------------------------------------------------------------------
 
-    // Channels ListView
-    ListView {
+    // DelegateModel for Channels ListView
+    DelegateModel {
 
         // ID
-        id: channelsListView_id
-        // Anchors
-        anchors.fill: parent
+        id: channelsListViewDelegateModel_id
         // Model
         model: rssModel
-        // Visibility
-        visible: false
-        // Enabled
-        enabled: false
-
         // Delegate
         delegate: Rectangle {
 
@@ -98,13 +105,49 @@ ApplicationWindow {
             // Height
             height: 80
 
+            // Image
+            Image {
+
+                // ID
+                id: channelImage_id
+                // Source = Url of ChannelModel' Channel-Object using "image" as Role.
+                source: image
+                // Visibility
+                visible: true
+                // Width [Min. Width of RSS Image]
+                width: 88
+                // Height [Min. Height of RSS Image]
+                height: 31
+
+            } /// Image
+
             // Text
             Text {
-                text: rssModel.data( index, title )
+                anchors.left: channelImage_id.right
+                text: title
             }
-            /// Text
 
-        } // Delegate
+        } /// Delegate
+
+    } /// DelegateModel for Channels ListView
+
+    // Channels ListView
+    ListView {
+
+        // ID
+        id: channelsListView_id
+        // Anchors
+        //anchors.fill: parent
+        // Width
+        width: 400
+        // Height
+        height: 400
+        // Visibility
+        visible: false
+        // Enabled
+        enabled: false
+        // Model & Delegate
+        model: channelsListViewDelegateModel_id
 
     } /// Channels ListView
 
@@ -133,6 +176,7 @@ ApplicationWindow {
             }
             Action {
                 text: "About"
+                onTriggered: showAboutAppDialog( )
             }
             Action {
                 text: "Quit"
@@ -141,6 +185,22 @@ ApplicationWindow {
         } /// Application
     }
     /// Menu
+
+    // ------------------------------------------------------------------------
+
+    // AboutAppDialog
+    AboutAppDialog {
+
+        // ID
+        id: about_DialogID
+        // Visibility
+        visible: false
+        // X
+        x: ( parent.width / 2 ) - ( width / 2 )
+        // Y
+        y: ( parent.height / 2 ) - ( height / 2 )
+
+    } /// AboutAppDialog
 
     // ------------------------------------------------------------------------
 

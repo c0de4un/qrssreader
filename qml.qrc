@@ -4,5 +4,6 @@
         <file>SimpleButton.qml</file>
         <file>UrlDialog.qml</file>
         <file>ChannelsListItemView.qml</file>
+        <file>AboutAppDialog.qml</file>
     </qresource>
 </RCC>

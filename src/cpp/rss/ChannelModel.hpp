@@ -82,11 +82,6 @@
 #include "Integer.hpp"
 #endif // !QRSS_READER_INTEGER_HPP
 
-// Include rss::Item
-#ifndef QRSS_READER_ITEM_HPP
-#include "Item.hpp"
-#endif // !QRSS_READER_ITEM_HPP
-
 // Include rss::Image
 #ifndef QRSS_READER_IMAGE_HPP
 #include "Image.hpp"
@@ -375,6 +370,15 @@ namespace rss
 		channel_ptr_t getChannelByIndex( const int pIndex ) const noexcept;
 
 		/**
+		  * Returns public-index of a Channel.
+		  *
+		  * @threadsafe - thread-lock used.
+		  * @param pChannel - Channel.
+		  * @throws - no exceptions.
+		**/
+		int getChannelIndex( const rss::Channel *const pChannel ) const noexcept;
+
+		/**
 		  * Searches added Channel insatnce using Link Element as Key.
 		  *
 		  * (?) Used by RSS-parser to check if Channel with the same
@@ -462,6 +466,11 @@ namespace rss
 		**/
 		Q_INVOKABLE void parseRSSFile( const QUrl pUrl ) noexcept;
 
+		Q_INVOKABLE QModelIndex getInvalidIndex( ) noexcept
+		{
+			return( QModelIndex( ) );
+		}
+
 		// ===========================================================
 		// OVERRIDE
 		// ===========================================================
@@ -476,6 +485,16 @@ namespace rss
 		  * @throws - no exceptions.
 		**/
 		virtual QVariant data( const QModelIndex & pIndex, int pRole = Qt::DisplayRole ) const override;
+
+		/**
+		  *
+		**/
+		//virtual bool canFetchMore( const QModelIndex & pIndex ) const override;
+
+		/**
+		  *
+		**/
+		virtual Qt::ItemFlags flags( const QModelIndex & pIndex ) const override;
 
 		/**
 		  * Search for Model-Index using col, row & parent-index.

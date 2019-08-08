@@ -396,7 +396,7 @@ namespace rss
 	  * @throws - no exceptions.
 	**/
 	bool Channel::empty( ) const noexcept
-	{ return( mElements.empty( ) ); }
+	{ return( mElements.empty( ) || mItems.empty( ) ); }
 
 	/**
 	  * Merge (move Elements from source to a destination Channel).

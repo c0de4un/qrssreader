@@ -115,6 +115,43 @@ namespace rss
 	} /// ChannelModel::getChannelByIndex
 
 	/**
+	  * Returns public-index of a Channel.
+	  *
+	  * @threadsafe - thread-lock used.
+	  * @param pChannel - Channel.
+	  * @throws - no exceptions.
+	**/
+	int ChannelModel::getChannelIndex( const rss::Channel *const pChannel ) const noexcept
+	{
+
+		// Thread-Lock
+		QMutexLocker uLock( &mChannelsMutex );
+
+		// Channels Count.
+		const auto channelsCount_( mChannels.size( ) );
+
+		// Channel.
+		rss::Channel * channel_( nullptr );
+
+		// Search Channel
+		for( int i = 0; i < channelsCount_; i++ )
+		{
+
+			// Get Channel.
+			channel_ = mChannels.at( i );
+
+			// Compare.
+			if ( channel_ == pChannel || channel_->id == pChannel->id )
+				return( true );
+
+		} /// Search Channel
+
+		// Return -1 to use as Root.
+		return( -1 );
+
+	}
+
+	/**
 	  * Searches added Channel insatnce using Link Element as Key.
 	  *
 	  * (?) Used by RSS-parser to check if Channel with the same
@@ -272,8 +309,13 @@ namespace rss
 			if ( image == nullptr )
 				return( QVariant( ) );
 
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+			// Debug
+			qDebug( ) << "ChannelModel::getChannelData - Image Url=" << *image->url;
+#endif // DEBUG
+
 			// Return Image Url
-			return( QVariant( image->url ) );
+			return( *image->url );
 
 		} /// [<image url="">] Image Url
 
@@ -289,7 +331,7 @@ namespace rss
 				return( QVariant( ) );
 
 			// Return Image Width, or invalid QVariant if not set.
-			return( image->width > 0 ? QVariant( image->width ) : QVariant( ) );
+			return( image->width > 0 ? image->width : QVariant( ) );
 
 		} /// [<image><width /></image>] Image Width
 
@@ -305,7 +347,7 @@ namespace rss
 				return( QVariant( ) );
 
 			// Return Image Height, or invalid QVariant if not set.
-			return( image->height > 0 ? QVariant( image->height ) : QVariant( ) );
+			return( image->height > 0 ? image->height : QVariant( ) );
 
 		} /// [<image><height /></image>] Image Height
 
@@ -569,11 +611,8 @@ namespace rss
 		qDebug( ) << "ChannelModel::onChannelsUpdated";
 #endif // DEBUG
 
-		// Create invalid Model-Index as root-Index.
-		QModelIndex modelIndex_( createIndex( 0, 0, nullptr ) );
-
-		// Emit signal.
-		emit dataChanged( modelIndex_, modelIndex_ );
+		beginInsertRows( QModelIndex( ), 0, mChannels.size( ) - 1 );
+		endInsertRows( );
 
 	}
 
@@ -668,6 +707,19 @@ namespace rss
 	// OVERRIDE
 	// ===========================================================
 
+	Qt::ItemFlags ChannelModel::flags( const QModelIndex & pIndex ) const
+	{
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "ChannelModel::flags, index.row=" << pIndex.row( ) << "index.col=" << pIndex.column( ) << "index.pointer=" << QString( pIndex.internalPointer( ) != nullptr );
+#endif // DEBUG
+
+		// Return
+		return( Qt::ItemFlags( Qt::ItemFlag::ItemIsEnabled | Qt::ItemFlag::ItemIsSelectable ) );
+
+	}
+
 	/**
 	  * Extract specific data using index.
 	  *
@@ -693,11 +745,7 @@ namespace rss
 #endif // DEBUG
 
 		// Get rss::Element
-		Element *const elementPtr( static_cast<Element*>( pIndex.internalPointer( ) ) );
-
-		// Cancel, if root.
-		if ( elementPtr == nullptr )
-			return( QVariant( ) );
+		Element *const elementPtr( pIndex.internalPointer( ) != nullptr ? static_cast<Element*>( pIndex.internalPointer( ) ) : getChannelByIndex( pIndex.row( ) ) );
 
 		// Handle RSS Element-Type.
 		switch( elementPtr->type )
@@ -756,74 +804,54 @@ namespace rss
 
 #if defined( QT_DEBUG ) // DEBUG
 		// Debug
-		qDebug( ) << "ChannelModel::index, index.row=" << parentIndex.row( ) << "index.col=" << parentIndex.column( ) << "index.pointer=" << QString( parentIndex.internalPointer( ) != nullptr );
+		qDebug( ) << "ChannelModel::index, index.row=" << pRow << "index.col=" << pCol;
 #endif // DEBUG
 
-		// Return root, if Model-Index is invalid.
-		if ( pRow < 0 || pCol < 0 || !parentIndex.isValid( ) )
-			return( createIndex( 0, 0, nullptr ) );
+		// Cancel, if trying to retrive index of root.
+		if ( pRow < 0 || pCol < 0 )
+			return( parentIndex );
 
-		// Thread-Lock
-		QMutexLocker uLock( &mChannelsMutex );
-
-		// Return Channel.
-		if ( parentIndex.internalPointer( ) == nullptr )
-		{ // Root
-
-			// Channel.
-			rss::Channel *const channel( getChannelByIndex( pRow ) );
-
-			// Return Model-Index for a Channel.
-			return( createIndex( pRow, pCol, channel ) );
-
-		} /// Root
-		else // sub-Element
+		// Root
+		if ( !parentIndex.isValid( ) )
 		{
 
-			// Get Element.
-			rss::Element *const element( static_cast<rss::Element*>( parentIndex.internalPointer( ) ) );
+			// Return Model-Index for a Channel.
+			return( createIndex( pRow, pCol, nullptr ) );
 
-			// Handle Element-Type.
-			switch( element->type )
-			{
+		} /// Root
+
+		// Channel.
+		if ( parentIndex.internalPointer( ) != nullptr )
+		{
+
+			// Get Element
+			rss::Element *const element_( static_cast<rss::Element*>( parentIndex.internalPointer( ) ) );
 
 			// Channel
-			case rss::ElementType::CHANNEL:
+			if ( element_->type == rss::ElementType::CHANNEL )
 			{
+				// Get Channel
+				rss::Channel *const channel_( static_cast<rss::Channel*>( element_ ) );
 
-				// Get Channel from Model-Index.
-				rss::Channel *const channel( static_cast<rss::Channel*>( parentIndex.internalPointer( ) ) );
-
-				// Get Item.
-				rss::Item *const item( static_cast<rss::Item*>( channel->getItem( pRow ) ) );
-
-#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-				// Null-check.
-				assert( item != nullptr && "ChannelModel::index - Item is null ! Check rowsCount method logic." );
-#endif /// DEBUG
-
-				// Return Model-Index for a Item.
-				return( createIndex( 0, 0, item ) );
+				// Return Model-Index for Channel' Item.
+				return( createIndex( pRow, pCol, channel_ ) );
 
 			} /// Channel
+			else if ( element_->type == rss::ElementType::ITEM )
+			{ // Item
 
-			// Channel Item
-			case rss::ElementType::ITEM:
-			{
+				// Get Item.
+				rss::Item *const item_( static_cast<rss::Item*>( element_ ) );
 
-				// Do not provide any Model-Indices for Item sub-Elements.
-				return( QModelIndex( ) );
+				// Return Model-Index for a Item.
+				return( createIndex( pRow, pCol, item_ ) );
 
+			} /// Item
 
-			} /// Channel Item
+		} /// Channel
 
-			// Default
-			default:
-				return( QModelIndex( ) ); // Return invalid-index.
-
-			}
-
-		} /// sub-Element.
+		// Return root.
+		return( parentIndex );
 
 	} /// ChannelModel::index
 
@@ -843,7 +871,7 @@ namespace rss
 		qDebug( ) << "ChannelModel::parent, index.row=" << pIndex.row( ) << "index.col=" << pIndex.column( ) << "index.pointer=" << QString( pIndex.internalPointer( ) != nullptr );
 #endif // DEBUG
 
-		// Cancel, if root || invalid.
+		// Return root if invalid.
 		if ( !pIndex.isValid( ) || pIndex.internalPointer( ) == nullptr )
 			return( QModelIndex( ) );
 
@@ -855,10 +883,6 @@ namespace rss
 		assert( element != nullptr && "ChannelModel::parent - Element is null ! Check ChannelModel::index() method." );
 #endif // DEBUG
 
-		// Channel has no parent Model-Index.
-		if ( element->type == ElementType::CHANNEL )
-			return( QModelIndex( ) );
-
 		// Cancel, if not Channel Item-Element.
 		if ( element->type != ElementType::ITEM )
 			return( QModelIndex( ) );
@@ -867,7 +891,7 @@ namespace rss
 		rss::Channel *const channel( static_cast<rss::Channel*>( element->parent ) );
 
 		// Generate Model-Index for Channel.
-		return( createIndex( 1, 0, channel ) );
+		return( createIndex( getChannelIndex( channel ), 0, nullptr ) );
 
 	} /// ChannelModel::parent
 
@@ -887,49 +911,15 @@ namespace rss
 		qDebug( ) << "ChannelModel::rowCount, index.row=" << parentIndex.row( ) << "index.col=" << parentIndex.column( ) << "index.pointer=" << QString( parentIndex.internalPointer( ) != nullptr );
 #endif // DEBUG
 
+		// Cancel, if bad-arguments.
+		if ( parentIndex.column( ) > 0 )
+			return( 0 );
+
 		// roo-ModelIndex (invalid ModelIndex).
 		if ( !parentIndex.isValid( ) )
-		{
-
-			// Thread-Lock
-			QMutexLocker uLock( &mChannelsMutex );
-
-			// Return Channels count.
 			return( mChannels.size( ) );
 
-		}
-
-		// root Model-Index.
-		if ( parentIndex.row( ) >= 0 && parentIndex.internalPointer( ) == nullptr )
-		{
-
-			// Get Channel.
-			rss::Channel *const channel_( getChannelByIndex( parentIndex.row( ) ) );
-
-#if defined( DEBUG ) // DEBUG
-			// Check Channel.
-			assert( channel_ != nullptr && "ChannelModel::rowCount - Channel is null !" );
-#else // !DEBUG
-			// Return 0, if Channel is null.
-			if ( channel_ == nullptr )
-				return( 0 );
-#endif // DEBUG
-
-			// Return Channel's Items Count.
-			return( channel_->countItems( ) );
-
-		} // root.
-
-		// Get Element.
-		rss::Element *const element( static_cast<rss::Element*>( parentIndex.internalPointer( ) ) );
-
-#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
-		// Check Element.
-		assert( element != nullptr && "ChannelModel::rowCount - Element is null ! None root-Index must have Element !" );
-#endif // DEBUG
-
-		// Return Element size.
-		return( element->count( ) );
+		return( 0 );
 
 	} /// ChannelModel::rowCount
 
@@ -949,24 +939,55 @@ namespace rss
 		qDebug( ) << "ChannelModel::hasChildren, index.row=" << pIndex.row( ) << "index.col=" << pIndex.column( ) << "index.pointer=" << QString( pIndex.internalPointer( ) != nullptr );
 #endif // DEBUG
 
-		// Invalid Model-Index == root.
-		if ( !pIndex.isValid( ) || pIndex.internalPointer( ) == nullptr )
-			return( mChannels.size( ) );
+		// Cancel, if Columns used.
+		if ( pIndex.column( ) > 0 )
+			return( false );
 
-		// Element.
-		rss::Element *const element( static_cast<rss::Element*>( pIndex.internalPointer( ) ) );
+		// Root.
+		if ( !pIndex.isValid( ) )
+			return( true );
 
-		// Channel
-		if ( element->type == rss::ElementType::CHANNEL )
+		// Channel.
+		if ( pIndex.internalPointer( ) == nullptr )
 		{
 
-			// Return Channel Items-Count.
-			return( element->count( ) );
+			// Get Channel.
+			rss::Channel *const channel_( getChannelByIndex( pIndex.row( ) ) );
+
+			// Return TRUE, if Channel have Items.
+			return( channel_ != nullptr && !channel_->empty( ) );
 
 		} /// Channel
 
-		// Items & their sub-Element no counted.
-		return( 0 );
+		// Get Element.
+		rss::Element *const element_( static_cast<rss::Element*>( pIndex.internalPointer( ) ) );
+
+		// Get Item
+		if ( element_->type == rss::ElementType::CHANNEL )
+		{// Channel
+
+			// Cast Element to Channel.
+			rss::Channel *const channel_( static_cast<rss::Channel*>( element_ ) );
+
+			// Return TRUE, if Item found.
+			return( channel_->empty( ) );
+
+		} /// Item
+		else if ( element_->type == rss::ElementType::ITEM ) // Item' Element
+		{
+
+			// Do not expose Item Elements to Views.
+			return( false );
+
+		} /// Item' Element
+
+#if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
+		// Debug
+		qDebug( ) << "ChannelModel::hasChildren - bad logic, unreachable code.";
+#endif // DEBUG
+
+		// Return FALSE
+		return( false );
 
 	} /// ChannelModel::hasChildren
 
