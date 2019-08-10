@@ -1,9 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>SimpleButton.qml</file>
-        <file>UrlDialog.qml</file>
-        <file>ChannelsListItemView.qml</file>
         <file>AboutAppDialog.qml</file>
+        <file>RSSSplitListView.qml</file>
+        <file>TextInputDialog.qml</file>
+        <file>ChannelListItem.qml</file>
     </qresource>
 </RCC>

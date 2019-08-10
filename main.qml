@@ -1,6 +1,7 @@
 import QtQuick 2.13
 import QtQuick.Window 2.13 // ApplicationWindow
-import QtQuick.Controls 2.5 // Views & Widgets
+import QtQuick.Controls 2.13 // SplitView
+import QtQuick.Layouts 1.3 // Required for Layouts of SplitView
 import QtQuick.Dialogs 1.2 // Dialog
 import QtQml.Models 2.12 // DelegateModel
 
@@ -17,7 +18,7 @@ ApplicationWindow {
     // Visibility
     visible: true
     // Width
-    width: 320
+    width: 640
     // Height
     height: 480
     // Title
@@ -41,7 +42,7 @@ ApplicationWindow {
     {
 
         if ( !urlInputDialog.visible )
-            urlInputDialog.show( );
+            urlInputDialog.open( );
 
     } /// showUrlDialog
 
@@ -70,10 +71,6 @@ ApplicationWindow {
         // Parse RSS File.
         rssModel.parseRSSFile( rssFileUrl );
 
-        // Show ChannelsListView
-        channelsListView_id.visible = true;
-        channelsListView_id.enabled = true;
-
     } /// openRSSFile
 
     /**
@@ -98,58 +95,39 @@ ApplicationWindow {
         // Model
         model: rssModel
         // Delegate
-        delegate: Rectangle {
+        delegate: ChannelListItem {
 
-            // Width
-            width: parent.width
-            // Height
-            height: 80
-
-            // Image
-            Image {
-
-                // ID
-                id: channelImage_id
-                // Source = Url of ChannelModel' Channel-Object using "image" as Role.
-                source: image
-                // Visibility
-                visible: true
-                // Width [Min. Width of RSS Image]
-                width: 88
-                // Height [Min. Height of RSS Image]
-                height: 31
-
-            } /// Image
-
-            // Text
-            Text {
-                anchors.left: channelImage_id.right
-                text: title
-            }
+            //
+            channelViewWidth: rssListViews_id.channelsWidth - 16
+            //
+            channelViewHeight: channelViewWidth / 3
+            //
+            imageSource: image
+            //
+            channelTitle: title
+            //
+            channelDescription: description
 
         } /// Delegate
 
     } /// DelegateModel for Channels ListView
 
-    // Channels ListView
-    ListView {
+    // RSS View
+    RSSSplitListView {
 
         // ID
-        id: channelsListView_id
-        // Anchors
-        //anchors.fill: parent
-        // Width
-        width: 400
+        id: rssListViews_id
+        // Channels Container Width
+        channelsWidth: mainWindow_id.width / 3
+        // Channel' Items Container Width
+        itemsWidth: mainWindow_id.width - channelsWidth
         // Height
-        height: 400
-        // Visibility
-        visible: false
-        // Enabled
-        enabled: false
-        // Model & Delegate
-        model: channelsListViewDelegateModel_id
+        rssHeight: mainWindow_id.height
+        // Channels ListView Model
+        channelsModel: channelsListViewDelegateModel_id
 
-    } /// Channels ListView
+    }
+    /// RSS View
 
     // ------------------------------------------------------------------------
 
@@ -195,10 +173,6 @@ ApplicationWindow {
         id: about_DialogID
         // Visibility
         visible: false
-        // X
-        x: ( parent.width / 2 ) - ( width / 2 )
-        // Y
-        y: ( parent.height / 2 ) - ( height / 2 )
 
     } /// AboutAppDialog
 
@@ -236,38 +210,21 @@ ApplicationWindow {
     // ------------------------------------------------------------------------
 
     // Url Input Dialog
-    UrlDialog {
+    TextInputDialog {
 
+        // Title
+        title: "RSS"
         // ID
         id: urlInputDialog
-        // Name
-        objectName: "urlInputDialog"
-        // Width
-        width: 200
-        // Height
-        height: 80
         // Visibility
         visible: false
-        // Title
-        title: "Url"
-        // EditText.Text
-        label: "https://qt.io"
-        // X
-        x: mainWindow_id.x + ( ( mainWindow_id.width / 2 ) - width / 2 )
-        // Y
-        y: mainWindow_id.y + ( ( mainWindow_id.height / 2 ) - height / 2 )
+        // OK
+        //onAccepted: {
 
-        // onDialogWindowOK
-        onDialogWindowOK: {
-            urlInputDialog.hide( );
-        } /// onDialogWindowOK
+        //} /// OK
 
-        // onDialogWindowDiscard
-        onDialogWindowDiscard: {
-            urlInputDialog.hide( );
-        } /// onDialogWindowDiscard
-
-    } /// Url Input Dialog
+    }
+    /// Url Input Dialog
 
     // ------------------------------------------------------------------------
 

@@ -25,8 +25,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # =================================================================================
 
 # QT.Core
-find_package(Qt5 COMPONENTS Core Quick Widgets Network Xml REQUIRED)
-
+find_package(Qt5 COMPONENTS Core Quick Qml QuickControls2 Widgets Network Xml REQUIRED)
 # Detect DEBUG-Mode
 if ( CMAKE_BUILD_TYPE STREQUAL "Debug" ) # DEBUG
     add_definitions( -DDEBUG=1 )
@@ -106,4 +105,4 @@ RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/bin" )
 target_compile_definitions( ${PROJECT_NAME} PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG> )
 
 # Link Executable Object
-target_link_libraries( ${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Quick Qt5::Widgets  Qt5::Network Qt5::Xml )
+target_link_libraries( ${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Quick Qt5::QuickControls2 Qt5::Qml Qt5::Widgets  Qt5::Network Qt5::Xml )

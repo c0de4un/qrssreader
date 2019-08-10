@@ -105,10 +105,6 @@ int main(int argc, char *argv[])
     // Set Engine
     MainWindowLogic::mMainWindowLogicInstance->mQQmlApplicationEngine = &engine;
 
-	// Return-Code.
-	// Make ChannelMode available for all Views.
-	//rootContext->setContextProperty( "rssModel", channelModel );
-
 	const auto returnCode( app.exec( ) );
 
 	// Delete ChannelModel.
