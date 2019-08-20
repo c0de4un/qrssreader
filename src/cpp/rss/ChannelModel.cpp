@@ -115,6 +115,46 @@ namespace rss
 	} /// ChannelModel::getChannelByIndex
 
 	/**
+	  * Returns Channel, associated with a specific Row.
+	  *
+	  * @threadsafe - thread-lock used.
+	  * @param pRow - Row.
+	  * @returns - Channel instance, or null.
+	  * @throw - no exceptions.
+	**/
+	rss::Channel * ChannelModel::getChannelByRow( const int pRow ) const noexcept
+	{
+
+#if defined( QT_DEBUG ) // DEBUG
+		// Debug-message
+		qDebug( ) << "ChannelModel::getChannelByRow - Row=" << QString::number( pRow );
+
+		// Check Range.
+		if ( pRow < 0 || pRow >= mChannels.size( ) )
+		{
+
+			// Error-message.
+			qDebug( ) << "ChannelModel::getChannelByRow - Invalid Range: " << QString::number( pRow );
+
+			// Return null.
+			return( nullptr );
+
+		} /// Check Range
+#else // !DEBUG
+		// Check Range.
+		if ( pRow < 0 || pRow >= mChannels.size( ) )
+			return( nullptr );
+#endif // DEBUG
+
+		// Thread-lock.
+		QMutexLocker uLock( &mChannelsMutex );
+
+		// Return Channel instance.
+		return( mChannels.at( pRow ) );
+
+	} /// ChannelModel::getChannelByRow
+
+	/**
 	  * Returns public-index of a Channel.
 	  *
 	  * @threadsafe - thread-lock used.

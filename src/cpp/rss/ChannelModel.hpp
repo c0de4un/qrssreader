@@ -379,6 +379,16 @@ namespace rss
 		int getChannelIndex( const rss::Channel *const pChannel ) const noexcept;
 
 		/**
+		  * Returns Channel, associated with a specific Row.
+		  *
+		  * @threadsafe - thread-lock used.
+		  * @param pRow - Row.
+		  * @returns - Channel instance, or null.
+		  * @throw - no exceptions.
+		**/
+		rss::Channel * getChannelByRow( const int pRow ) const noexcept;
+
+		/**
 		  * Searches added Channel insatnce using Link Element as Key.
 		  *
 		  * (?) Used by RSS-parser to check if Channel with the same

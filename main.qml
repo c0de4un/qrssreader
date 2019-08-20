@@ -7,6 +7,7 @@ import QtQml.Models 2.12 // DelegateModel
 
 import MainWindowLogic 1.0
 import ChannelModel 1.0
+import ProxyChannelModel 1.0
 
 // Main Window
 ApplicationWindow {
@@ -108,9 +109,71 @@ ApplicationWindow {
             //
             channelDescription: description
 
+            // Mouse-Area
+            MouseArea {
+
+                // ID
+                id: rssChannelsView_MouseArea_id
+                // Anchors
+                anchors.fill: parent
+                // OnClick
+                onClicked: {
+
+                    // Highlight Item.
+                    rssListViews_id.channelsListIndex = index;
+
+                    // Set Selected Channel.
+                    proxyRssModel.setSelectedChannelIndex( link );
+
+                } /// OnClick
+
+            } /// Mouse-Area
+
         } /// Delegate
 
     } /// DelegateModel for Channels ListView
+
+    // DelegateModel for Channel' Items ListView
+    DelegateModel {
+
+        // ID
+        id: channelItemsListViewDelegateModel_id
+        // Model
+        model: proxyRssModel
+
+        delegate: ChannelItemView {
+
+            // Container View-Width
+            width: rssListViews_id.itemsWidth
+            // Container View-Height
+            height: width / 4
+            // Title
+            titleValue: title
+            // Description
+            descriptionValue: description
+            // Visibility
+            visible: true
+
+            // Mouse-Area
+            MouseArea {
+
+                // ID
+                id: rssItemView_MouseArea_id
+                // Anchors
+                anchors.fill: parent
+                // OnClick
+                onClicked: {
+
+                    // Highlight Item.
+                    rssListViews_id.itemsListIndex = index;
+
+                } /// OnClick
+
+            } /// Mouse-Area
+
+        } /// Delegate
+    }
+    /// DelegateModel for Channel' Items ListView
 
     // RSS View
     RSSSplitListView {
@@ -125,6 +188,8 @@ ApplicationWindow {
         rssHeight: mainWindow_id.height
         // Channels ListView Model
         channelsModel: channelsListViewDelegateModel_id
+        // Channel' Items ListView Model
+        channelItemsModel: channelItemsListViewDelegateModel_id
 
     }
     /// RSS View

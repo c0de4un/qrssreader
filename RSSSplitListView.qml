@@ -18,7 +18,13 @@ Row {
     property alias channelsModel: channelsListView_id.model
 
     // Alias for Channel' Items ListView Model.
-    //property alias channelsModel: itemsListView_id.model
+    property alias channelItemsModel: channelItemsListView_id.model
+
+    // Alias for Channel' Items ListView current index.
+    property alias itemsListIndex: channelItemsListView_id.currentIndex
+
+    // Alias for Channels ListView current index.
+    property alias channelsListIndex: channelsListView_id.currentIndex
 
     // Width
     width: channelsWidth + itemsWidth
@@ -39,6 +45,7 @@ Row {
             // ID
             id: channelsListView_id
             anchors.fill: parent
+            clip: true
             // Highlight
             highlight: Rectangle {
                 color: "lightsteelblue"
@@ -46,6 +53,8 @@ Row {
             }
             // Focus
             focus: true
+            // Unselect
+            currentIndex: -1
 
         } /// Channels ListView
 
@@ -58,6 +67,30 @@ Row {
         width: itemsWidth
         // Height
         height: rssHeight
+        //background: Rectangle {
+            //color: "#FF0000"
+            //anchors.fill: parent
+        //}
+
+        // Channel' Items ListView
+        ListView {
+
+            // ID
+            id: channelItemsListView_id
+            anchors.fill: parent
+            clip: true
+            // Highlight
+            highlight: Rectangle {
+                color: "lightsteelblue"
+                radius: 1
+            }
+            // Focus
+            focus: true
+            // Unselect
+            currentIndex: -1
+
+        }
+        /// Channel' Items ListView
 
     } /// Channel' Items ListView Container
 

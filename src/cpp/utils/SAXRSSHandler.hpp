@@ -150,7 +150,7 @@ namespace rss
 	  * @authors Denis Z. (code4un@yandex.ru)
 	**/
 	class SAXRSSHandler : public QXmlDefaultHandler
-	{// TODO SAXRSSHandler
+	{
 
 	private:
 

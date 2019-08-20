@@ -9,10 +9,28 @@ QDialogs.Dialog {
     // Width
     width: 240
     // Height
-    height: 180
+    height: 100
     // Title
-    title: "About QRSSReader Application"
+    title: "About QRSSReader"
 
-    //
+    // Content-Item
+    contentItem: Rectangle {
+
+        // Text
+        Text {
+            id: aboutTextView_id
+            anchors.fill: parent
+            font.italic: true
+            font.bold: false
+            wrapMode: Text.WrapAnywhere
+            elide: Text.ElideLeft
+            text: "QRSSReader - example applicaton to read RSS feed.
+
+    Created with QT API (QtQuick, QML).
+
+    Demonstrates usage of Data-Models with Proxies, ListViews."
+        }
+
+    } /// Content-Item
 
 } /// Dialog

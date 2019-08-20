@@ -175,13 +175,14 @@ namespace rss
 #if defined( QT_DEBUG ) || defined( DEBUG ) // DEBUG
 		// Debug
 		qDebug( ) << "Channel#" << QString::number( id ) << "::getItem";
-
-		// Check range.
-		assert( pIndex < mItems.size( ) && "Channel::getItem - Item index is out of the range !" );
 #endif // DEBUG
 
 		// Thread-Lock.
 		QMutexLocker uLock( &mItemsMutex );
+
+		// Cancel, if out-of-range.
+		if ( pIndex < 0 || pIndex > mItems.size( ) - 1 )
+			return( nullptr );
 
 		// Return Item.
 		return( mItems.at( pIndex ) );

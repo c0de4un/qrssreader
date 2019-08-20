@@ -58,8 +58,11 @@ int main(int argc, char *argv[])
     // Register MainWindowLogic.
     qmlRegisterType<MainWindowLogic>( "MainWindowLogic", 1, 0, "MainWindowLogic" );
 
-	//
+	// Register ChannelModel Type within QML.
 	qmlRegisterType<rss::ChannelModel>( "ChannelModel", 1, 0, "ChannelModel" );
+
+	// Register ProxyChannelModel Type in QML.
+	qmlRegisterType<rss::ProxyChannelModel>( "ProxyChannelModel", 1, 0, "ProxyChannelModel" );
 
     // Create QML Application Enigne
     QQmlApplicationEngine engine;
@@ -67,11 +70,25 @@ int main(int argc, char *argv[])
 	// Create ChannelsModel.
 	rss::ChannelModel *const channelModel( new rss::ChannelModel( ) );
 
+	// Create Proxy-ChannelModel.
+	rss::ProxyChannelModel *const proxyChannelModel( new rss::ProxyChannelModel( ) );
+
+	// Configure ProxyChannelModel instance.
+	//proxyChannelModel->setSortOrder( Qt::SortOrder::DescendingOrder );
+	//proxyChannelModel->setSortCaseSensitivity( Qt::CaseSensitivity::CaseSensitive );
+	//proxyChannelModel->setSortRole( "pubDate" );
+
+	// Set Proxy-Model Source.
+	proxyChannelModel->setSourceModel( channelModel );
+
 	// Get root-Context.
 	QQmlContext *const rootContext( engine.rootContext( ) );
 
-	// Make ChannelMode available for all Views.
+	// Make ChannelModel available for all Views.
 	rootContext->setContextProperty( "rssModel", channelModel );
+
+	// Make ProxyChannelModel available for all Views.
+	rootContext->setContextProperty( "proxyRssModel", proxyChannelModel );
 
     // QML
     const QUrl url(QStringLiteral("qrc:/main.qml"));
@@ -109,6 +126,9 @@ int main(int argc, char *argv[])
 
 	// Delete ChannelModel.
 	delete channelModel;
+
+	// Delete ProxyChannelModel.
+	delete proxyChannelModel;
 
     // Execute QT Application
 	return( returnCode );

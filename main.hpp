@@ -31,6 +31,11 @@
 #include "src/cpp/rss/ChannelModel.hpp"
 #endif // !Q_RSS_READER_CHANNEL_MODEL_HPP
 
+// Include rss::ProxyChannelModel
+#ifndef QRSS_READER_PROXY_CHANNEL_MODEL_HPP
+#include "src/cpp/rss/ProxyChannelModel.hpp"
+#endif // !QRSS_READER_PROXY_CHANNEL_MODEL_HPP
+
 // Include rss::SAXRSSHandler
 #ifndef QRSS_READER_SAX_RSS_HANDLER_HPP
 #include "src/cpp/utils/SAXRSSHandler.hpp"

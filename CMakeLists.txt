@@ -53,6 +53,7 @@ set ( QT_RSS_READER_PROJECT_HEADERS
     "src/cpp/rss/Image.hpp"
     "src/cpp/rss/Element.hpp"
     "src/cpp/rss/ChannelModel.hpp"
+    "src/cpp/rss/ProxyChannelModel.hpp"
     "src/cpp/rss/TextInput.hpp"
     # UI
     "src/cpp/ui/MainWindowLogic.hpp"
@@ -83,6 +84,7 @@ set ( QT_RSS_READER_PROJECT_SOURCES
     "src/cpp/rss/Image.cpp"
     "src/cpp/rss/Element.cpp"
     "src/cpp/rss/ChannelModel.cpp"
+    "src/cpp/rss/ProxyChannelModel.cpp"
     "src/cpp/rss/TextInput.cpp"
     # UTILS
     "src/cpp/utils/SAXRSSHandler.cpp"
